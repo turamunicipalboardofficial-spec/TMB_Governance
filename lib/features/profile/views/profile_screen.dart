@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import '../../../core/constants/app_assets.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_sizes.dart';
+import '../../../core/storage/secure_storage_service.dart';
 import '../../../routes/app_routes.dart';
 import '../controllers/profile_controller.dart';
 
@@ -105,115 +106,121 @@ class ProfileScreen extends GetView<ProfileController> {
   //  Profile Header
   // ──────────────────────────────────────────────────────────────
   Widget _buildProfileHeader() {
-    return Container(
-      width: double.infinity,
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          colors: [AppColors.primary, AppColors.primaryLight],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-      ),
-      child: Column(
-        children: [
-          const SizedBox(height: AppSizes.paddingXXL),
+    return FutureBuilder<Map<String, dynamic>?>(
+      future: SecureStorageService.to.getUserData(),
+      builder: (context, snapshot) {
+        final userData = snapshot.data;
+        final firstName = userData?['firstname'] ?? '';
+        final lastName = userData?['lastname'] ?? '';
+        final name = '$firstName $lastName'.trim();
+        final email = userData?['email'] ?? '';
 
-          // Logo
-          ClipRRect(
-            borderRadius: BorderRadius.circular(14),
-            child: Image.asset(
-              AppAssets.logo,
-              width: 56,
-              height: 56,
-              fit: BoxFit.contain,
+        // Build initials from first letter of first name + first letter of last name
+        String initials = '';
+        if (firstName.isNotEmpty) initials += firstName[0].toUpperCase();
+        if (lastName.isNotEmpty) initials += lastName[0].toUpperCase();
+        if (initials.isEmpty) initials = 'A';
+
+        return Container(
+          width: double.infinity,
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              colors: [AppColors.primary, AppColors.primaryLight],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
             ),
           ),
-          const SizedBox(height: AppSizes.paddingS),
-          const Text(
-            'Tura Municipal Board',
-            style: TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w600,
-              color: AppColors.textOnPrimary,
-            ),
-          ),
+          child: Column(
+            children: [
+              const SizedBox(height: AppSizes.paddingXXL),
 
-          const SizedBox(height: AppSizes.paddingXXL),
-
-          // Avatar with initials
-          Obx(() {
-            final firstName = controller.userFirstName.value;
-            final lastName = controller.userLastName.value;
-            String initials = '';
-            if (firstName.isNotEmpty) initials += firstName[0].toUpperCase();
-            if (lastName.isNotEmpty) initials += lastName[0].toUpperCase();
-            if (initials.isEmpty) initials = 'A';
-
-            return CircleAvatar(
-              radius: 40,
-              backgroundColor: AppColors.textOnPrimary,
-              child: Text(
-                initials,
-                style: const TextStyle(
-                  fontSize: 28,
-                  fontWeight: FontWeight.w700,
-                  color: AppColors.primary,
+              // Logo
+              ClipRRect(
+                borderRadius: BorderRadius.circular(14),
+                child: Image.asset(
+                  AppAssets.logo,
+                  width: 56,
+                  height: 56,
+                  fit: BoxFit.contain,
                 ),
               ),
-            );
-          }),
+              const SizedBox(height: AppSizes.paddingS),
+              const Text(
+                'Tura Municipal Board',
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.textOnPrimary,
+                ),
+              ),
 
-          const SizedBox(height: AppSizes.paddingM),
+              const SizedBox(height: AppSizes.paddingXXL),
 
-          // Name
-          Obx(() => Text(
-                controller.userName.value.isNotEmpty
-                    ? controller.userName.value
-                    : 'Admin',
+              // Avatar with initials
+              CircleAvatar(
+                radius: 40,
+                backgroundColor: AppColors.textOnPrimary,
+                child: Text(
+                  initials,
+                  style: const TextStyle(
+                    fontSize: 28,
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.primary,
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: AppSizes.paddingM),
+
+              // Name
+              Text(
+                name.isNotEmpty ? name : 'Admin',
                 style: const TextStyle(
                   fontSize: 22,
                   fontWeight: FontWeight.w700,
                   color: AppColors.textOnPrimary,
                 ),
-              )),
+              ),
 
-          const SizedBox(height: AppSizes.paddingXS),
+              const SizedBox(height: AppSizes.paddingXS),
 
-          // Role badge
-          Obx(() => Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: AppSizes.paddingM,
-                  vertical: AppSizes.paddingXXS,
-                ),
-                decoration: BoxDecoration(
-                  color: AppColors.textOnPrimary.withOpacity(0.2),
-                  borderRadius: BorderRadius.circular(AppSizes.radiusRound),
-                ),
-                child: Text(
-                  controller.userRole.value.toUpperCase(),
-                  style: const TextStyle(
-                    fontSize: 11,
-                    fontWeight: FontWeight.w700,
-                    color: AppColors.textOnPrimary,
-                    letterSpacing: 1.0,
-                  ),
-                ),
-              )),
+              // Role badge
+              Obx(() => Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppSizes.paddingM,
+                      vertical: AppSizes.paddingXXS,
+                    ),
+                    decoration: BoxDecoration(
+                      color: AppColors.textOnPrimary.withOpacity(0.2),
+                      borderRadius: BorderRadius.circular(AppSizes.radiusRound),
+                    ),
+                    child: Text(
+                      controller.userRole.value.toUpperCase(),
+                      style: const TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.textOnPrimary,
+                        letterSpacing: 1.0,
+                      ),
+                    ),
+                  )),
 
-          const SizedBox(height: AppSizes.paddingS),
+              const SizedBox(height: AppSizes.paddingS),
 
-          // Email
-          Obx(() => Text(
-                controller.userEmail.value,
+              // Email
+              Text(
+                email,
                 style: TextStyle(
                   fontSize: 13,
                   color: AppColors.textOnPrimary.withOpacity(0.85),
                 ),
-              )),
+              ),
 
-          const SizedBox(height: AppSizes.paddingXXL),
-        ],
-      ),
+              const SizedBox(height: AppSizes.paddingXXL),
+            ],
+          ),
+        );
+      },
     );
   }
 
