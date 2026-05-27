@@ -227,6 +227,21 @@ class UserManagementController extends GetxController {
         );
         await _repository.createConsumer(request);
         CustomSnackbar.showSuccess('Consumer created successfully');
+      } else if (role == 'driver') {
+        final request = CreateDriverRequest(
+          firstname: firstnameCtrl.text.trim(),
+          lastname: lastnameCtrl.text.trim(),
+          email: emailCtrl.text.trim(),
+          password: passwordCtrl.text,
+          dob: dobCtrl.text.trim(),
+          phoneNo: phoneNoCtrl.text.trim(),
+          wardId: selectedCreateWardId.value!,
+          localityId: selectedCreateLocalityId.value,
+          driverLicenseNumber: driverLicenseCtrl.text.trim(),
+          licenseExpiry: licenseExpiryCtrl.text.trim(),
+        );
+        await _repository.createDriver(request);
+        CustomSnackbar.showSuccess('Driver created successfully');
       }
 
       _clearForm();

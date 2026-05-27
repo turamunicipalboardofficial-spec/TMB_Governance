@@ -31,6 +31,10 @@ class CreateUserScreen extends GetView<UserManagementController> {
                 _buildRoleSelector(),
                 const SizedBox(height: AppSizes.paddingL),
                 _buildCommonFields(),
+                if (controller.selectedCreateRole.value == 'driver') ...[
+                  const SizedBox(height: AppSizes.paddingL),
+                  _buildDriverFields(),
+                ],
                 const SizedBox(height: AppSizes.paddingXL),
                 _buildSubmitButton(),
                 const SizedBox(height: AppSizes.paddingL),
@@ -58,6 +62,8 @@ class CreateUserScreen extends GetView<UserManagementController> {
             _buildRoleChip('Consumer', 'consumer', Icons.person),
             const SizedBox(width: AppSizes.paddingS),
             _buildRoleChip('CEO', 'ceo', Icons.workspace_premium),
+            const SizedBox(width: AppSizes.paddingS),
+            _buildRoleChip('Driver', 'driver', Icons.local_shipping),
           ],
         )),
       ],
@@ -283,6 +289,62 @@ class CreateUserScreen extends GetView<UserManagementController> {
     });
   }
 
+  Widget _buildDriverFields() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          'Driver Information',
+          style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+        ),
+        const SizedBox(height: AppSizes.paddingM),
+        TextFormField(
+          controller: controller.driverLicenseCtrl,
+          decoration: const InputDecoration(
+            labelText: 'Driver License Number *',
+            hintText: 'e.g. ML-01-2024-1234567',
+          ),
+          validator: (v) {
+            if (controller.selectedCreateRole.value == 'driver' &&
+                (v == null || v.trim().isEmpty)) {
+              return 'License number is required';
+            }
+            return null;
+          },
+        ),
+        const SizedBox(height: AppSizes.paddingM),
+        TextFormField(
+          controller: controller.licenseExpiryCtrl,
+          readOnly: true,
+          decoration: const InputDecoration(
+            labelText: 'License Expiry *',
+            hintText: 'YYYY-MM-DD',
+            suffixIcon: Icon(Icons.calendar_today),
+          ),
+          onTap: () async {
+            final date = await showDatePicker(
+              context: Get.context!,
+              initialDate: DateTime.now().add(const Duration(days: 365)),
+              firstDate: DateTime.now(),
+              lastDate: DateTime.now().add(const Duration(days: 365 * 10)),
+            );
+            if (date != null) {
+              controller.licenseExpiryCtrl.text =
+                  '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
+            }
+          },
+          validator: (v) {
+            if (controller.selectedCreateRole.value == 'driver' &&
+                (v == null || v.trim().isEmpty)) {
+              return 'License expiry is required';
+            }
+            return null;
+          },
+        ),
+      ],
+    );
+  }
+
   Widget _buildSubmitButton() {
     return Obx(() => ElevatedButton(
       onPressed: controller.isCreating.value ? null : controller.createUser,
@@ -318,6 +380,8 @@ class CreateUserScreen extends GetView<UserManagementController> {
         return 'Consumer';
       case 'ceo':
         return 'CEO';
+      case 'driver':
+        return 'Driver';
       default:
         return 'User';
     }
