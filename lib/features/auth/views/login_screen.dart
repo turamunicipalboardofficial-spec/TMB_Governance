@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import '../../../core/constants/app_assets.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_sizes.dart';
 import '../../../core/design_system/molecules/custom_input_field.dart';
@@ -22,18 +23,16 @@ class LoginScreen extends GetView<AuthController> {
             children: [
               const SizedBox(height: AppSizes.paddingXXXL * 2),
 
-              // Logo / App Name
-              Container(
-                height: 80,
-                width: 80,
-                decoration: BoxDecoration(
-                  color: AppColors.primary,
+              // Logo
+              Center(
+                child: ClipRRect(
                   borderRadius: BorderRadius.circular(AppSizes.radiusL),
-                ),
-                child: const Icon(
-                  Icons.admin_panel_settings,
-                  size: 48,
-                  color: AppColors.textOnPrimary,
+                  child: Image.asset(
+                    AppAssets.logo,
+                    width: 80,
+                    height: 80,
+                    fit: BoxFit.contain,
+                  ),
                 ),
               ),
               const SizedBox(height: AppSizes.paddingXL),
