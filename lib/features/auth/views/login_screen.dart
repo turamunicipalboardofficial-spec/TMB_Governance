@@ -29,8 +29,8 @@ class LoginScreen extends GetView<AuthController> {
                   borderRadius: BorderRadius.circular(AppSizes.radiusL),
                   child: Image.asset(
                     AppAssets.logo,
-                    width: 80,
-                    height: 80,
+                    width: 120,
+                    height: 120,
                     fit: BoxFit.contain,
                   ),
                 ),
@@ -63,21 +63,23 @@ class LoginScreen extends GetView<AuthController> {
               const SizedBox(height: AppSizes.paddingL),
 
               // Password Field
-              Obx(() => CustomInputField(
-                label: 'Password',
-                hint: 'Enter your password',
-                controller: controller.passwordController,
-                obscureText: controller.isPasswordHidden.value,
-                prefixIcon: Icons.lock_outlined,
-                suffixIcon: IconButton(
-                  icon: Icon(
-                    controller.isPasswordHidden.value
-                        ? Icons.visibility_off_outlined
-                        : Icons.visibility_outlined,
+              Obx(
+                () => CustomInputField(
+                  label: 'Password',
+                  hint: 'Enter your password',
+                  controller: controller.passwordController,
+                  obscureText: controller.isPasswordHidden.value,
+                  prefixIcon: Icons.lock_outlined,
+                  suffixIcon: IconButton(
+                    icon: Icon(
+                      controller.isPasswordHidden.value
+                          ? Icons.visibility_off_outlined
+                          : Icons.visibility_outlined,
+                    ),
+                    onPressed: controller.togglePasswordVisibility,
                   ),
-                  onPressed: controller.togglePasswordVisibility,
                 ),
-              )),
+              ),
               const SizedBox(height: AppSizes.paddingM),
 
               // Forgot Password
@@ -99,11 +101,13 @@ class LoginScreen extends GetView<AuthController> {
               const SizedBox(height: AppSizes.paddingXL),
 
               // Login Button
-              Obx(() => PrimaryButton(
-                text: 'Sign In',
-                onPressed: controller.login,
-                isLoading: controller.isLoading.value,
-              )),
+              Obx(
+                () => PrimaryButton(
+                  text: 'Sign In',
+                  onPressed: controller.login,
+                  isLoading: controller.isLoading.value,
+                ),
+              ),
               const SizedBox(height: AppSizes.paddingXXL),
 
               // Version

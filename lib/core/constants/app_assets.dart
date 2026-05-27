@@ -4,6 +4,7 @@ class AppAssets {
 
   // Images
   static const String logo = '$_icons/tura_tr_logo.png';
+  static const String splash_logo = '$_images/tmb_logo.png';
   static const String splashBg = '$_images/splash_bg.png';
   static const String placeholder = '$_images/placeholder.png';
   static const String emptyState = '$_images/empty_state.png';
