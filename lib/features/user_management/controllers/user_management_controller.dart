@@ -86,6 +86,7 @@ class UserManagementController extends GetxController {
   Future<void> fetchLocalities() async {
     final wardId = selectedCreateWardId.value;
     localities.clear();
+    selectedCreateLocalityId.value = null;
     if (wardId == null) return;
     isLoadingLocalities.value = true;
     try {
@@ -93,9 +94,27 @@ class UserManagementController extends GetxController {
         ApiEndpoints.localityList,
         queryParameters: {'ward_id': wardId},
       );
-      final data = response.data['locality'] as List? ?? [];
+      debugPrint('📍 Locality response for ward $wardId: ${response.data}');
+      // Handle different response formats
+      List<dynamic> data = [];
+      final responseData = response.data;
+      if (responseData is Map<String, dynamic>) {
+        if (responseData.containsKey('locality')) {
+          data = responseData['locality'] as List? ?? [];
+        } else if (responseData.containsKey('data')) {
+          final innerData = responseData['data'];
+          if (innerData is List) {
+            data = innerData;
+          } else if (innerData is Map && innerData.containsKey('locality')) {
+            data = innerData['locality'] as List? ?? [];
+          }
+        }
+      } else if (responseData is List) {
+        data = responseData;
+      }
+      debugPrint('📍 Parsed ${data.length} localities');
       localities.assignAll(
-        data.map((e) => LocalityModel.fromJson(e)).toList(),
+        data.map((e) => LocalityModel.fromJson(e as Map<String, dynamic>)).toList(),
       );
       // Match pending locality name for edit mode
       if (_pendingLocalityName != null && localities.isNotEmpty) {
@@ -107,8 +126,9 @@ class UserManagementController extends GetxController {
         }
         _pendingLocalityName = null;
       }
-    } catch (e) {
-      // Silently fail
+    } catch (e, stackTrace) {
+      debugPrint('❌ Failed to fetch localities: $e');
+      debugPrint('Stack: $stackTrace');
     } finally {
       isLoadingLocalities.value = false;
     }
