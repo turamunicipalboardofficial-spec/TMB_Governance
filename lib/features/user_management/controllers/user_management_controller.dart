@@ -90,9 +90,9 @@ class UserManagementController extends GetxController {
     if (wardId == null) return;
     isLoadingLocalities.value = true;
     try {
-      final response = await NetworkService.to.get(
+      final response = await NetworkService.to.post(
         ApiEndpoints.localityList,
-        queryParameters: {'ward_id': wardId},
+        data: {'ward_id': wardId},
       );
       debugPrint('📍 Locality response for ward $wardId: ${response.data}');
       // Handle different response formats
