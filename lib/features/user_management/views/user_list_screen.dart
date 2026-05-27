@@ -68,15 +68,17 @@ class UserListScreen extends GetView<UserManagementController> {
           // Filter chips
           SingleChildScrollView(
             scrollDirection: Axis.horizontal,
-            child: Obx(() => Row(
-              children: [
-                _buildRoleFilterChip('All', ''),
-                _buildRoleFilterChip('Consumers', 'user'),
-                _buildRoleFilterChip('Employees', 'editor'),
-                _buildRoleFilterChip('CEO', 'ceo'),
-                _buildRoleFilterChip('Drivers', 'driver'),
-              ],
-            )),
+            child: Obx(
+              () => Row(
+                children: [
+                  _buildRoleFilterChip('All', ''),
+                  _buildRoleFilterChip('Consumers', 'user'),sho
+                  _buildRoleFilterChip('Employees', 'editor'),
+                  _buildRoleFilterChip('CEO', 'ceo'),
+                  _buildRoleFilterChip('Drivers', 'driver'),
+                ],
+              ),
+            ),
           ),
         ],
       ),
@@ -118,7 +120,8 @@ class UserListScreen extends GetView<UserManagementController> {
             right: AppSizes.paddingM,
             top: AppSizes.paddingS,
           ),
-          itemCount: controller.users.length +
+          itemCount:
+              controller.users.length +
               (controller.users.length < controller.totalUsers.value ? 1 : 0),
           itemBuilder: (context, index) {
             if (index == controller.users.length) {
@@ -162,13 +165,19 @@ class UserListScreen extends GetView<UserManagementController> {
             const SizedBox(height: 2),
             Text(
               user.email,
-              style: const TextStyle(fontSize: 12, color: AppColors.textSecondary),
+              style: const TextStyle(
+                fontSize: 12,
+                color: AppColors.textSecondary,
+              ),
             ),
             const SizedBox(height: 4),
             Row(
               children: [
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 6,
+                    vertical: 2,
+                  ),
                   decoration: BoxDecoration(
                     color: roleColor.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(4),
@@ -186,7 +195,10 @@ class UserListScreen extends GetView<UserManagementController> {
                   const SizedBox(width: 6),
                   Text(
                     'Ward ${user.wardId}',
-                    style: const TextStyle(fontSize: 11, color: AppColors.textTertiary),
+                    style: const TextStyle(
+                      fontSize: 11,
+                      color: AppColors.textTertiary,
+                    ),
                   ),
                 ],
               ],
@@ -242,7 +254,9 @@ class UserListScreen extends GetView<UserManagementController> {
             },
             child: Text(
               newStatus ? 'Activate' : 'Deactivate',
-              style: TextStyle(color: newStatus ? AppColors.success : AppColors.error),
+              style: TextStyle(
+                color: newStatus ? AppColors.success : AppColors.error,
+              ),
             ),
           ),
         ],
@@ -256,7 +270,9 @@ class UserListScreen extends GetView<UserManagementController> {
         padding: const EdgeInsets.all(AppSizes.paddingL),
         decoration: const BoxDecoration(
           color: AppColors.surface,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(AppSizes.radiusL)),
+          borderRadius: BorderRadius.vertical(
+            top: Radius.circular(AppSizes.radiusL),
+          ),
         ),
         child: SingleChildScrollView(
           child: Column(
@@ -276,15 +292,20 @@ class UserListScreen extends GetView<UserManagementController> {
               const SizedBox(height: AppSizes.paddingL),
               Text(
                 user.fullName,
-                style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                style: const TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
               const SizedBox(height: AppSizes.paddingS),
               _buildDetailRow('Email', user.email),
               if (user.phoneNo != null) _buildDetailRow('Phone', user.phoneNo!),
               if (user.dob != null) _buildDetailRow('DOB', user.dob!),
               _buildDetailRow('Role', user.role.toUpperCase()),
-              if (user.wardId != null) _buildDetailRow('Ward ID', user.wardId.toString()),
-              if (user.locality != null) _buildDetailRow('Locality', user.locality!),
+              if (user.wardId != null)
+                _buildDetailRow('Ward ID', user.wardId.toString()),
+              if (user.locality != null)
+                _buildDetailRow('Locality', user.locality!),
               const SizedBox(height: AppSizes.paddingM),
               Row(
                 children: [
@@ -307,11 +328,17 @@ class UserListScreen extends GetView<UserManagementController> {
                         _showToggleDialog(user);
                       },
                       icon: Icon(
-                        (user.isActive ?? false) ? Icons.block : Icons.check_circle,
+                        (user.isActive ?? false)
+                            ? Icons.block
+                            : Icons.check_circle,
                       ),
-                      label: Text((user.isActive ?? false) ? 'Deactivate' : 'Activate'),
+                      label: Text(
+                        (user.isActive ?? false) ? 'Deactivate' : 'Activate',
+                      ),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: (user.isActive ?? false) ? AppColors.error : AppColors.success,
+                        backgroundColor: (user.isActive ?? false)
+                            ? AppColors.error
+                            : AppColors.success,
                         foregroundColor: AppColors.textOnPrimary,
                       ),
                     ),
