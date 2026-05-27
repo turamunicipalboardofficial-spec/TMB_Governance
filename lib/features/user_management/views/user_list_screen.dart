@@ -71,8 +71,8 @@ class UserListScreen extends GetView<UserManagementController> {
             child: Obx(() => Row(
               children: [
                 _buildRoleFilterChip('All', ''),
-                _buildRoleFilterChip('Consumers', 'consumer'),
-                _buildRoleFilterChip('Employees', 'employee'),
+                _buildRoleFilterChip('Consumers', 'user'),
+                _buildRoleFilterChip('Employees', 'editor'),
                 _buildRoleFilterChip('CEO', 'ceo'),
               ],
             )),
@@ -173,7 +173,7 @@ class UserListScreen extends GetView<UserManagementController> {
                     borderRadius: BorderRadius.circular(4),
                   ),
                   child: Text(
-                    user.role.toUpperCase(),
+                    _getRoleDisplayName(user.role),
                     style: TextStyle(
                       fontSize: 10,
                       fontWeight: FontWeight.w600,
@@ -355,12 +355,25 @@ class UserListScreen extends GetView<UserManagementController> {
     switch (role) {
       case 'ceo':
         return const Color(0xFF6A1B9A);
-      case 'employee':
+      case 'editor':
         return const Color(0xFF2E7D32);
-      case 'consumer':
+      case 'user':
         return const Color(0xFF1565C0);
       default:
         return AppColors.textSecondary;
+    }
+  }
+
+  String _getRoleDisplayName(String role) {
+    switch (role) {
+      case 'editor':
+        return 'EMPLOYEE';
+      case 'user':
+        return 'CONSUMER';
+      case 'ceo':
+        return 'CEO';
+      default:
+        return role.toUpperCase();
     }
   }
 
@@ -368,9 +381,9 @@ class UserListScreen extends GetView<UserManagementController> {
     switch (role) {
       case 'ceo':
         return Icons.workspace_premium;
-      case 'employee':
+      case 'editor':
         return Icons.badge;
-      case 'consumer':
+      case 'user':
         return Icons.person;
       default:
         return Icons.person;
