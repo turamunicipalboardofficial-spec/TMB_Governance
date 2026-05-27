@@ -47,7 +47,7 @@ class UserManagementController extends GetxController {
   final licenseExpiryCtrl = TextEditingController();
 
   // Dropdowns
-  final selectedCreateRole = 'driver'.obs;
+  final selectedCreateRole = 'employee'.obs;
   final selectedCreateWardId = RxnInt();
   final selectedTruckId = RxnInt();
 
@@ -200,23 +200,7 @@ class UserManagementController extends GetxController {
     isCreating.value = true;
     try {
       final role = selectedCreateRole.value;
-      if (role == 'driver') {
-        final request = CreateDriverRequest(
-          firstname: firstnameCtrl.text.trim(),
-          lastname: lastnameCtrl.text.trim(),
-          email: emailCtrl.text.trim(),
-          password: passwordCtrl.text,
-          dob: dobCtrl.text.trim(),
-          phoneNo: phoneNoCtrl.text.trim(),
-          wardId: selectedCreateWardId.value!,
-          localityId: selectedCreateLocalityId.value,
-          driverLicenseNumber: driverLicenseCtrl.text.trim(),
-          licenseExpiry: licenseExpiryCtrl.text.trim(),
-          truckId: selectedTruckId.value,
-        );
-        await _repository.createDriver(request);
-        CustomSnackbar.showSuccess('Driver created successfully');
-      } else if (role == 'employee') {
+      if (role == 'employee' || role == 'ceo') {
         final request = CreateEmployeeRequest(
           firstname: firstnameCtrl.text.trim(),
           lastname: lastnameCtrl.text.trim(),
@@ -226,9 +210,10 @@ class UserManagementController extends GetxController {
           phoneNo: phoneNoCtrl.text.trim(),
           wardId: selectedCreateWardId.value!,
           localityId: selectedCreateLocalityId.value,
+          role: role == 'ceo' ? 'ceo' : null,
         );
         await _repository.createEmployee(request);
-        CustomSnackbar.showSuccess('Employee created successfully');
+        CustomSnackbar.showSuccess('${role == 'ceo' ? 'CEO' : 'Employee'} created successfully');
       } else if (role == 'consumer') {
         final request = CreateConsumerRequest(
           firstname: firstnameCtrl.text.trim(),

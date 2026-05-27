@@ -7,6 +7,7 @@ class CreateEmployeeRequest {
   final String phoneNo;
   final int wardId;
   final int? localityId;
+  final String? role;
 
   CreateEmployeeRequest({
     required this.firstname,
@@ -17,6 +18,7 @@ class CreateEmployeeRequest {
     required this.phoneNo,
     required this.wardId,
     this.localityId,
+    this.role,
   });
 
   Map<String, dynamic> toJson() {
@@ -31,6 +33,9 @@ class CreateEmployeeRequest {
     };
     if (localityId != null) {
       data['locality_id'] = localityId;
+    }
+    if (role != null) {
+      data['role'] = role;
     }
     return data;
   }

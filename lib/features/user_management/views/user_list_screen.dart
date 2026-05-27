@@ -71,12 +71,9 @@ class UserListScreen extends GetView<UserManagementController> {
             child: Obx(() => Row(
               children: [
                 _buildRoleFilterChip('All', ''),
-                _buildRoleFilterChip('Drivers', 'driver'),
+                _buildRoleFilterChip('Consumers', 'consumer'),
                 _buildRoleFilterChip('Employees', 'employee'),
-                _buildRoleFilterChip('Consumers', 'user'),
-                _buildRoleFilterChip('Admins', 'admin'),
                 _buildRoleFilterChip('CEO', 'ceo'),
-                _buildRoleFilterChip('Editors', 'editor'),
               ],
             )),
           ),
@@ -356,16 +353,12 @@ class UserListScreen extends GetView<UserManagementController> {
 
   Color _getRoleColor(String role) {
     switch (role) {
-      case 'admin':
-        return AppColors.error;
       case 'ceo':
         return const Color(0xFF6A1B9A);
-      case 'driver':
-        return const Color(0xFF1565C0);
       case 'employee':
         return const Color(0xFF2E7D32);
-      case 'editor':
-        return const Color(0xFFEF6C00);
+      case 'consumer':
+        return const Color(0xFF1565C0);
       default:
         return AppColors.textSecondary;
     }
@@ -373,16 +366,12 @@ class UserListScreen extends GetView<UserManagementController> {
 
   IconData _getRoleIcon(String role) {
     switch (role) {
-      case 'admin':
-        return Icons.admin_panel_settings;
       case 'ceo':
         return Icons.workspace_premium;
-      case 'driver':
-        return Icons.local_shipping;
       case 'employee':
         return Icons.badge;
-      case 'editor':
-        return Icons.edit_note;
+      case 'consumer':
+        return Icons.person;
       default:
         return Icons.person;
     }
