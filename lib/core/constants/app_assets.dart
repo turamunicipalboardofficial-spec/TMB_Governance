@@ -3,7 +3,7 @@ class AppAssets {
   static const String _icons = 'assets/icons';
 
   // Images
-  static const String logo = '$_images/logo.png';
+  static const String logo = '$_icons/tura_tr_logo.png';
   static const String splashBg = '$_images/splash_bg.png';
   static const String placeholder = '$_images/placeholder.png';
   static const String emptyState = '$_images/empty_state.png';
