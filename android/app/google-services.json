@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "507664340568",
+    "project_id": "turamunicipalboard-5d2eb",
+    "storage_bucket": "turamunicipalboard-5d2eb.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:507664340568:android:e369b569836e82acf61c2d",
+        "android_client_info": {
+          "package_name": "com.tmb.tura_municipal_board"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDS3WxPiVc_aHFoipkN3tSz-hDjKZyLNKY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:507664340568:android:1009f6e057c69fa1f61c2d",
+        "android_client_info": {
+          "package_name": "com.turamunicipalboard.tmb_governance"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDS3WxPiVc_aHFoipkN3tSz-hDjKZyLNKY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

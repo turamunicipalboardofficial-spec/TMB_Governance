@@ -1,0 +1,57 @@
+class UserModel {
+  final int id;
+  final String firstname;
+  final String lastname;
+  final String email;
+  final String? phoneNo;
+  final String? dob;
+  final String role;
+  final int? wardId;
+  final String? locality;
+  final bool? isActive;
+
+  UserModel({
+    required this.id,
+    required this.firstname,
+    required this.lastname,
+    required this.email,
+    this.phoneNo,
+    this.dob,
+    required this.role,
+    this.wardId,
+    this.locality,
+    this.isActive,
+  });
+
+  factory UserModel.fromJson(Map<String, dynamic> json) {
+    return UserModel(
+      id: json['id'] ?? 0,
+      firstname: json['firstname'] ?? '',
+      lastname: json['lastname'] ?? '',
+      email: json['email'] ?? '',
+      phoneNo: json['phone_no'],
+      dob: json['dob'],
+      role: json['role'] ?? '',
+      wardId: json['ward_id'],
+      locality: json['locality'],
+      isActive: json['is_active'],
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'firstname': firstname,
+      'lastname': lastname,
+      'email': email,
+      'phone_no': phoneNo,
+      'dob': dob,
+      'role': role,
+      'ward_id': wardId,
+      'locality': locality,
+      'is_active': isActive,
+    };
+  }
+
+  String get fullName => '$firstname $lastname';
+}

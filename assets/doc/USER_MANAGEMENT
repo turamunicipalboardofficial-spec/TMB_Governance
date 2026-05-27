@@ -1,0 +1,679 @@
+### Admin APIs
+
+> **Authentication:** JWT token required. User must have `role = 'admin'`, `role = 'ceo'`, or `role = 'editor'`.
+
+#### 12. Add New Truck
+
+```http
+POST /api/admin/trucks
+Authorization: Bearer {token}
+Content-Type: application/json
+
+{
+    "truck_number": "TM-GT-006",
+    "plate_number": "ML-07-F-1111",
+    "truck_type": "compactor",
+    "capacity_tons": 5.00,
+    "ward_id": 3
+}
+```
+
+**Request Body:**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `truck_number` | string | Yes | Unique truck identifier (max 20 chars) |
+| `plate_number` | string | Yes | Vehicle plate number (max 20 chars) |
+| `truck_type` | string | Yes | One of: `compactor`, `dumper`, `side_loader`, `roll_off` |
+| `capacity_tons` | float | Yes | Capacity in tons (min 0.5) |
+| `ward_id` | int | Yes | Ward ID (must exist in `ward_list`) |
+| `status` | string | No | One of: `active`, `maintenance`, `retired`, `breakdown`. Default: `active` |
+| `latitude` | float | No | Initial latitude |
+| `longitude` | float | No | Initial longitude |
+
+**Response (201):**
+```json
+{
+    "status": true,
+    "message": "Truck added successfully",
+    "data": {
+        "id": 6,
+        "truck_number": "TM-GT-006",
+        "plate_number": "ML-07-F-1111",
+        "truck_type": "compactor",
+        "capacity_tons": 5.00,
+        "ward_id": 3,
+        "status": "active"
+    }
+}
+```
+
+---
+
+#### 13. Update Truck Details
+
+```http
+PUT /api/admin/trucks/{id}
+Authorization: Bearer {token}
+Content-Type: application/json
+
+{
+    "truck_type": "roll_off",
+    "capacity_tons": 7.00,
+    "ward_id": 2,
+    "status": "maintenance"
+}
+```
+
+**Path Parameters:**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `id` | int | Yes | Truck ID |
+
+**Request Body (all fields optional):**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `truck_number` | string | No | Unique truck identifier |
+| `plate_number` | string | No | Vehicle plate number |
+| `truck_type` | string | No | One of: `compactor`, `dumper`, `side_loader`, `roll_off` |
+| `capacity_tons` | float | No | Capacity in tons (min 0.5) |
+| `ward_id` | int | No | Ward ID |
+| `status` | string | No | One of: `active`, `maintenance`, `retired`, `breakdown` |
+
+---
+
+#### 14. Assign Driver to Truck
+
+```http
+POST /api/admin/trucks/assign-driver
+Authorization: Bearer {token}
+Content-Type: application/json
+
+{
+    "driver_user_id": 101,
+    "truck_id": 1
+}
+```
+
+**Request Body:**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `driver_user_id` | int | Yes | User ID of the driver (must exist in `users`) |
+| `truck_id` | int | Yes | Truck ID (must exist in `garbage_trucks`) |
+
+**Response:**
+```json
+{
+    "status": true,
+    "message": "Driver assigned to truck successfully",
+    "data": {
+        "driver": {
+            "id": 1,
+            "user_id": 101,
+            "name": "Ramesh Sangma",
+            "license": "ML-DL-2023-001"
+        },
+        "truck": {
+            "id": 1,
+            "truck_number": "TM-GT-001"
+        }
+    }
+}
+```
+
+---
+
+#### 15. Create Collection Schedule
+
+```http
+POST /api/admin/trucks/schedule
+Authorization: Bearer {token}
+Content-Type: application/json
+
+{
+    "ward_id": 1,
+    "truck_id": 1,
+    "route_id": 1,
+    "day_of_week": "monday",
+    "start_time": "06:00",
+    "end_time": "10:00",
+    "collection_type": "regular"
+}
+```
+
+**Request Body:**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `ward_id` | int | Yes | Ward ID (must exist in `ward_list`) |
+| `truck_id` | int | Yes | Truck ID (must exist in `garbage_trucks`) |
+| `route_id` | int | No | Route ID (must exist in `garbage_truck_routes`) |
+| `day_of_week` | string | Yes | One of: `monday`, `tuesday`, `wednesday`, `thursday`, `friday`, `saturday`, `sunday` |
+| `start_time` | string | Yes | Start time in `H:i` format (e.g., `06:00`) |
+| `end_time` | string | Yes | End time in `H:i` format, must be after `start_time` |
+| `collection_type` | string | No | One of: `regular`, `bulk`, `recycling`, `special`. Default: `regular` |
+
+**Response (201):**
+```json
+{
+    "status": true,
+    "message": "Schedule created successfully",
+    "data": {
+        "id": 10,
+        "ward_id": 1,
+        "truck_id": 1,
+        "route_id": 1,
+        "day_of_week": "monday",
+        "start_time": "06:00",
+        "end_time": "10:00",
+        "collection_type": "regular"
+    }
+}
+```
+
+---
+
+#### 16. Fleet Dashboard
+
+Admin overview of all fleet activity.
+
+```http
+GET /api/admin/trucks/dashboard
+Authorization: Bearer {token}
+```
+
+**Response:**
+```json
+{
+    "status": true,
+    "data": {
+        "fleet_summary": {
+            "total_trucks": 10,
+            "active_trucks": 7,
+            "on_route_now": 5,
+            "in_maintenance": 2,
+            "inactive": 1
+        },
+        "driver_summary": {
+            "total_drivers": 12,
+            "on_duty_now": 5,
+            "off_duty": 7
+        },
+        "today_collections": {
+            "total_scheduled": 8,
+            "completed": 3,
+            "in_progress": 4,
+            "pending": 1
+        },
+        "active_trucks": [
+            {
+                "truck_number": "TM-GT-001",
+                "driver": "Ramesh Sangma",
+                "ward": "Ward 1",
+                "route": "Main Street Route",
+                "progress": "2/4 stops",
+                "last_update": "2026-05-11T16:30:45Z"
+            }
+        ]
+    }
+}
+```
+
+---
+
+### Admin User Management APIs
+
+Admin endpoints for creating driver, employee, and consumer users. These are protected by the `role:admin,ceo` middleware.
+
+#### 17. Create Driver User
+
+Creates a user with `role=driver` AND creates the `garbage_truck_drivers` profile record in a single transaction.
+
+```http
+POST /api/admin/users/driver
+Authorization: Bearer {admin_token}
+Content-Type: application/json
+
+{
+    "firstname": "John",
+    "lastname": "Sangma",
+    "email": "john.driver@example.com",
+    "password": "password123",
+    "dob": "1990-05-15",
+    "phone_no": "9876543210",
+    "ward_id": 1,
+    "locality": "Tura Main",
+    "driver_license_number": "ML-2024-12345",
+    "license_expiry": "2027-12-31",
+    "truck_id": 1
+}
+```
+
+**Request Body:**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `firstname` | string | Yes | First name (2-50 chars) |
+| `lastname` | string | Yes | Last name (2-50 chars) |
+| `email` | string | Yes | Unique email address |
+| `password` | string | Yes | Minimum 6 characters |
+| `dob` | string | Yes | Date of birth (`YYYY-MM-DD`) |
+| `phone_no` | string | Yes | Phone number (min 10 digits) |
+| `ward_id` | int | Yes | Ward ID (must exist in `ward_lists`) |
+| `locality` | string | No | Locality name |
+| `driver_license_number` | string | Yes | Driver license number |
+| `license_expiry` | string | Yes | License expiry date (`YYYY-MM-DD`, must be future) |
+| `truck_id` | int | No | Truck ID to assign (must exist in `garbage_trucks`) |
+
+**Response (201):**
+```json
+{
+    "status": "success",
+    "message": "Driver created successfully",
+    "data": {
+        "user": {
+            "id": 798,
+            "firstname": "John",
+            "lastname": "Sangma",
+            "email": "john.driver@example.com",
+            "phone_no": "9876543210",
+            "dob": "1990-05-15",
+            "role": "driver",
+            "ward_id": 1
+        },
+        "driver_profile": {
+            "id": 1,
+            "driver_license_number": "ML-2024-12345",
+            "license_expiry": "2027-12-31",
+            "truck_id": 1,
+            "truck_number": "TM-GT-001",
+            "is_on_duty": false
+        }
+    }
+}
+```
+
+**Error (422 - Validation):**
+```json
+{
+    "status": false,
+    "message": "Validation failed",
+    "errors": {
+        "email": ["The email has already been taken."]
+    }
+}
+```
+
+---
+
+#### 18. Create Employee User
+
+Creates a user with `role=employee`.
+
+```http
+POST /api/admin/users/employee
+Authorization: Bearer {admin_token}
+Content-Type: application/json
+
+{
+    "firstname": "Priya",
+    "lastname": "Marak",
+    "email": "priya.employee@example.com",
+    "password": "password123",
+    "dob": "1992-08-20",
+    "phone_no": "9876543211",
+    "ward_id": 2
+}
+```
+
+**Request Body:**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `firstname` | string | Yes | First name (2-50 chars) |
+| `lastname` | string | Yes | Last name (2-50 chars) |
+| `email` | string | Yes | Unique email address |
+| `password` | string | Yes | Minimum 6 characters |
+| `dob` | string | Yes | Date of birth (`YYYY-MM-DD`) |
+| `phone_no` | string | Yes | Phone number (min 10 digits) |
+| `ward_id` | int | Yes | Ward ID (must exist in `ward_lists`) |
+| `locality` | string | No | Locality name |
+
+**Response (201):**
+```json
+{
+    "status": "success",
+    "message": "Employee created successfully",
+    "data": {
+        "id": 799,
+        "firstname": "Priya",
+        "lastname": "Marak",
+        "email": "priya.employee@example.com",
+        "phone_no": "9876543211",
+        "dob": "1992-08-20",
+        "role": "employee",
+        "ward_id": 2
+    }
+}
+```
+
+---
+
+#### 19. Create Consumer (Citizen) User
+
+Creates a user with `role=user`.
+
+```http
+POST /api/admin/users/consumer
+Authorization: Bearer {admin_token}
+Content-Type: application/json
+
+{
+    "firstname": "David",
+    "lastname": "Momin",
+    "email": "david.citizen@example.com",
+    "password": "password123",
+    "dob": "1988-03-10",
+    "phone_no": "9876543212",
+    "ward_id": 1,
+    "locality": "Tura Bazaar"
+}
+```
+
+**Request Body:**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `firstname` | string | Yes | First name (2-50 chars) |
+| `lastname` | string | Yes | Last name (2-50 chars) |
+| `email` | string | Yes | Unique email address |
+| `password` | string | Yes | Minimum 6 characters |
+| `dob` | string | Yes | Date of birth (`YYYY-MM-DD`) |
+| `phone_no` | string | Yes | Phone number (min 10 digits) |
+| `ward_id` | int | No | Ward ID (must exist in `ward_lists`) |
+| `locality` | string | No | Locality name |
+
+**Response (201):**
+```json
+{
+    "status": "success",
+    "message": "Consumer created successfully",
+    "data": {
+        "id": 800,
+        "firstname": "David",
+        "lastname": "Momin",
+        "email": "david.citizen@example.com",
+        "phone_no": "9876543212",
+        "dob": "1988-03-10",
+        "role": "user",
+        "ward_id": 1
+    }
+}
+```
+
+---
+
+#### 20. List Users
+
+Returns a paginated list of users with optional role/ward filters and search.
+
+```http
+GET /api/admin/users?role=driver&ward_id=1&search=john&per_page=15
+Authorization: Bearer {admin_token}
+```
+
+**Query Parameters (all optional):**
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `role` | string | - | Filter by role: `user`, `driver`, `employee`, `admin`, `ceo`, `editor` |
+| `ward_id` | int | - | Filter by ward ID |
+| `search` | string | - | Search by name, email, or phone |
+| `per_page` | int | 15 | Results per page (1-100) |
+
+**Response (200):**
+```json
+{
+    "status": "success",
+    "data": {
+        "current_page": 1,
+        "data": [
+            {
+                "id": 797,
+                "firstname": "Driver",
+                "lastname": "Test",
+                "email": "driver@gmail.com",
+                "phone_no": "9865322568",
+                "dob": "2008-05-01",
+                "role": "driver",
+                "ward_id": 1,
+                "locality": null
+            }
+        ],
+        "total": 1,
+        "per_page": 15
+    }
+}
+```
+
+---
+
+#### 21. Update Driver Profile
+
+Update an existing driver's profile (truck assignment, license details).
+
+```http
+PUT /api/admin/users/driver/{user_id}
+Authorization: Bearer {admin_token}
+Content-Type: application/json
+
+{
+    "truck_id": 2,
+    "driver_license_number": "ML-2024-99999",
+    "license_expiry": "2028-06-30"
+}
+```
+
+**Request Body (all fields optional):**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `driver_license_number` | string | No | Updated license number |
+| `license_expiry` | string | No | Updated license expiry (`YYYY-MM-DD`) |
+| `truck_id` | int | No | New truck assignment (must exist in `garbage_trucks`) |
+| `is_on_duty` | boolean | No | Override duty status |
+
+**Response (200):**
+```json
+{
+    "status": "success",
+    "message": "Driver profile updated successfully",
+    "data": {
+        "user": {
+            "id": 797,
+            "firstname": "Driver",
+            "lastname": "Test",
+            "email": "driver@gmail.com"
+        },
+        "driver_profile": {
+            "id": 1,
+            "driver_license_number": "ML-2024-99999",
+            "license_expiry": "2028-06-30",
+            "truck_id": 2,
+            "truck_number": "TM-GT-002",
+            "is_on_duty": false
+        }
+    }
+}
+```
+
+**Error (404 - Driver profile not found):**
+```json
+{
+    "status": false,
+    "message": "Driver profile not found. Create a driver profile first."
+}
+```
+
+> **Note:** If a driver was created via `/api/register` with `role=driver` but has no `garbage_truck_drivers` record, use the `/api/admin/users/driver` POST endpoint to create a proper driver account. The `PUT` endpoint can only update existing profiles.
+
+---
+
+#### 22. Update User Details
+
+Update any user's basic details (name, email, phone, ward, locality, role, dob, password).
+
+```http
+PUT /api/admin/users/{user_id}
+Authorization: Bearer {admin_token}
+Content-Type: application/json
+
+{
+    "firstname": "Updated",
+    "lastname": "Name",
+    "phone_no": "9876543210",
+    "ward_id": 2,
+    "locality": "New Locality"
+}
+```
+
+**Path Parameters:**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `user_id` | int | Yes | User ID |
+
+**Request Body (all fields optional):**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `firstname` | string | No | First name (2-50 chars) |
+| `lastname` | string | No | Last name (2-50 chars) |
+| `email` | string | No | Unique email address |
+| `password` | string | No | Minimum 6 characters |
+| `dob` | string | No | Date of birth (`YYYY-MM-DD`) |
+| `phone_no` | string | No | Phone number (min 10 digits) |
+| `ward_id` | int | No | Ward ID (must exist in `ward_lists`) |
+| `locality` | string | No | Locality name |
+| `role` | string | No | One of: `user`, `driver`, `employee`, `admin`, `ceo`, `editor` |
+
+**Response (200):**
+```json
+{
+    "status": "success",
+    "message": "User updated successfully",
+    "data": {
+        "id": 797,
+        "firstname": "Updated",
+        "lastname": "Name",
+        "email": "driver@gmail.com",
+        "phone_no": "9876543210",
+        "dob": "2008-05-01",
+        "role": "driver",
+        "ward_id": 2,
+        "locality": "New Locality"
+    }
+}
+```
+
+**Error (422 - Validation):**
+```json
+{
+    "status": false,
+    "message": "Validation failed",
+    "errors": {
+        "email": ["The email has already been taken."]
+    }
+}
+```
+
+**Error (404 - Not Found):**
+```json
+{
+    "status": false,
+    "message": "User not found"
+}
+```
+
+---
+
+#### 23. Toggle User Active Status
+
+Activate or deactivate a user account. Deactivated users cannot log in.
+
+```http
+PATCH /api/admin/users/{user_id}/toggle-active
+Authorization: Bearer {admin_token}
+Content-Type: application/json
+
+{
+    "is_active": false
+}
+```
+
+**Path Parameters:**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `user_id` | int | Yes | User ID |
+
+**Request Body:**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `is_active` | boolean | Yes | `true` to activate, `false` to deactivate |
+
+**Response (200 - Deactivated):**
+```json
+{
+    "status": "success",
+    "message": "User has been deactivated",
+    "data": {
+        "id": 797,
+        "firstname": "Driver",
+        "lastname": "Test",
+        "email": "driver@gmail.com",
+        "is_active": false
+    }
+}
+```
+
+**Response (200 - Activated):**
+```json
+{
+    "status": "success",
+    "message": "User has been activated",
+    "data": {
+        "id": 797,
+        "firstname": "Driver",
+        "lastname": "Test",
+        "email": "driver@gmail.com",
+        "is_active": true
+    }
+}
+```
+
+**Error (400 - Bad Request):**
+```json
+{
+    "status": false,
+    "message": "is_active field is required and must be a boolean"
+}
+```
+
+**Error (404 - Not Found):**
+```json
+{
+    "status": false,
+    "message": "User not found"
+}
+```
+
+> **Note:** When a user is deactivated (`is_active = false`), their login attempts will return: `"Your account has been deactivated. Please contact the administrator."` with HTTP 403. Existing JWT tokens will also be blocked by the middleware.
+
+---
+
+
