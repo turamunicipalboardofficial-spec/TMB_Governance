@@ -74,6 +74,7 @@ class UserListScreen extends GetView<UserManagementController> {
                 _buildRoleFilterChip('Consumers', 'user'),
                 _buildRoleFilterChip('Employees', 'editor'),
                 _buildRoleFilterChip('CEO', 'ceo'),
+                _buildRoleFilterChip('Drivers', 'driver'),
               ],
             )),
           ),
@@ -359,6 +360,8 @@ class UserListScreen extends GetView<UserManagementController> {
         return const Color(0xFF2E7D32);
       case 'user':
         return const Color(0xFF1565C0);
+      case 'driver':
+        return const Color(0xFFEF6C00);
       default:
         return AppColors.textSecondary;
     }
@@ -372,6 +375,8 @@ class UserListScreen extends GetView<UserManagementController> {
         return 'CONSUMER';
       case 'ceo':
         return 'CEO';
+      case 'driver':
+        return 'DRIVER';
       default:
         return role.toUpperCase();
     }
@@ -385,6 +390,8 @@ class UserListScreen extends GetView<UserManagementController> {
         return Icons.badge;
       case 'user':
         return Icons.person;
+      case 'driver':
+        return Icons.local_shipping;
       default:
         return Icons.person;
     }
