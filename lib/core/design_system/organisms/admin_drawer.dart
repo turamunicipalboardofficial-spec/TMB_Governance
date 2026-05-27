@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import '../../constants/app_assets.dart';
 import '../../constants/app_colors.dart';
 import '../../constants/app_sizes.dart';
 import '../../../routes/app_routes.dart';
@@ -17,7 +18,7 @@ class AdminDrawer extends StatelessWidget {
     return Drawer(
       child: Column(
         children: [
-          _buildHeader(),
+          _buildHeader(context),
           Expanded(
             child: FutureBuilder<String>(
               future: _getRole(),
@@ -30,13 +31,13 @@ class AdminDrawer extends StatelessWidget {
                   children: [
                     _buildSectionTitle('Management'),
                     _buildTile(
-                      Icons.dashboard,
+                      Icons.dashboard_rounded,
                       'Dashboard',
                       () => Get.toNamed(AppRoutes.adminDashboard),
                     ),
                     if (isCeo)
                       _buildTile(
-                        Icons.supervised_user_circle,
+                        Icons.supervised_user_circle_rounded,
                         'Users & Roles',
                         () => Get.toNamed(AppRoutes.userRoleManagement),
                       ),
@@ -47,68 +48,69 @@ class AdminDrawer extends StatelessWidget {
                     ),
                     if (isCeo)
                       _buildTile(
-                        Icons.description,
+                        Icons.receipt_long_rounded,
                         'Trade License',
                         () => Get.toNamed(AppRoutes.renewalList),
                       ),
                     if (isCeo || isAdmin)
                       _buildTile(
-                        Icons.report_problem,
+                        Icons.report_problem_rounded,
                         'Grievances',
                         () => Get.toNamed(AppRoutes.grievanceList),
                       ),
                     if (isCeo)
                       _buildTile(
-                        Icons.receipt_long,
+                        Icons.receipt_rounded,
                         'Billing',
                         () => Get.toNamed(AppRoutes.billingDashboard),
                       ),
                     if (isCeo)
                       _buildTile(
-                        Icons.delete,
+                        Icons.delete_rounded,
                         'Garbage Management',
                         () => Get.toNamed(AppRoutes.garbageDashboard),
                       ),
-                    const Divider(),
+                    const Divider(indent: 16, endIndent: 16),
                     _buildSectionTitle('Communication'),
                     if (isCeo)
                       _buildTile(
-                        Icons.campaign,
+                        Icons.campaign_rounded,
                         'Advertisements',
                         () => Get.toNamed(AppRoutes.adList),
                       ),
                     if (isCeo || isAdmin)
                       _buildTile(
-                        Icons.announcement,
+                        Icons.announcement_rounded,
                         'Notices',
                         () => Get.toNamed(AppRoutes.noticeList),
                       ),
                     if (isCeo || isAdmin)
                       _buildTile(
-                        Icons.notifications,
+                        Icons.notifications_rounded,
                         'Notifications',
                         () => Get.toNamed(AppRoutes.notificationList),
                       ),
-                    const Divider(),
+                    const Divider(indent: 16, endIndent: 16),
                     _buildSectionTitle('Reports'),
                     if (isCeo)
                       _buildTile(
-                        Icons.payment,
+                        Icons.payment_rounded,
                         'Payment History',
                         () => Get.toNamed(AppRoutes.paymentHistory),
                       ),
                     if (isCeo)
                       _buildTile(
-                        Icons.pets,
+                        Icons.pets_rounded,
                         'Pet Dog Applications',
                         () => Get.toNamed(AppRoutes.petDogList),
                       ),
                     if (isCeo)
                       _buildTile(
-                        Icons.account_balance,
+                        Icons.account_balance_rounded,
                         'Holding Tax Stats',
                         () => Get.toNamed(AppRoutes.holdingTaxStats),
                       ),
+                    const SizedBox(height: 8),
                   ],
                 );
               },
@@ -116,17 +118,17 @@ class AdminDrawer extends StatelessWidget {
           ),
           const Divider(height: 1),
           _buildTile(
-            Icons.person,
+            Icons.person_rounded,
             'Profile',
             () => Get.toNamed(AppRoutes.adminProfile),
           ),
           _buildTile(
-            Icons.lock,
+            Icons.lock_rounded,
             'Change Password',
             () => Get.toNamed(AppRoutes.adminChangePassword),
           ),
           _buildTile(
-            Icons.logout,
+            Icons.logout_rounded,
             'Logout',
             () => _showLogoutDialog(context),
             color: AppColors.error,
@@ -137,20 +139,27 @@ class AdminDrawer extends StatelessWidget {
     );
   }
 
-  Widget _buildHeader() {
+  Widget _buildHeader(BuildContext context) {
     return FutureBuilder<Map<String, dynamic>?>(
       future: SecureStorageService.to.getUserData(),
       builder: (context, snapshot) {
         final userData = snapshot.data;
-        final name = userData != null
-            ? '${userData['firstname']} ${userData['lastname']}'
-            : 'Admin';
+        final firstName = userData?['firstname'] ?? '';
+        final lastName = userData?['lastname'] ?? '';
+        final name = '$firstName $lastName'.trim();
         final email = userData?['email'] ?? '';
+
+        // Build initials from first letter of first name + first letter of last name
+        String initials = '';
+        if (firstName.isNotEmpty) initials += firstName[0].toUpperCase();
+        if (lastName.isNotEmpty) initials += lastName[0].toUpperCase();
+        if (initials.isEmpty) initials = 'A';
+
         return Container(
           width: double.infinity,
           padding: EdgeInsets.fromLTRB(
             AppSizes.paddingL,
-            MediaQuery.of(context).padding.top + AppSizes.paddingL,
+            MediaQuery.of(context).padding.top + AppSizes.paddingXL,
             AppSizes.paddingL,
             AppSizes.paddingL,
           ),
@@ -164,27 +173,90 @@ class AdminDrawer extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const CircleAvatar(
-                radius: 30,
-                backgroundColor: AppColors.textOnPrimary,
-                child: Icon(Icons.person, size: 36, color: AppColors.primary),
+              // Logo
+              Row(
+                children: [
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(10),
+                    child: Image.asset(
+                      AppAssets.logo,
+                      width: 44,
+                      height: 44,
+                      fit: BoxFit.contain,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  const Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Tura Municipal Board',
+                          style: TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w700,
+                            color: AppColors.textOnPrimary,
+                          ),
+                        ),
+                        Text(
+                          'Admin Portal',
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: AppColors.textOnPrimary,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
               ),
-              const SizedBox(height: AppSizes.paddingM),
-              Text(
-                name,
-                style: const TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.textOnPrimary,
-                ),
-              ),
-              const SizedBox(height: 2),
-              Text(
-                email,
-                style: const TextStyle(
-                  fontSize: 13,
-                  color: AppColors.textOnPrimary,
-                ),
+              const SizedBox(height: AppSizes.paddingL),
+              const Divider(color: Colors.white24, height: 1),
+              const SizedBox(height: AppSizes.paddingL),
+              // User avatar with initials + name/email
+              Row(
+                children: [
+                  CircleAvatar(
+                    radius: 24,
+                    backgroundColor: AppColors.textOnPrimary,
+                    child: Text(
+                      initials,
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.primary,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          name.isNotEmpty ? name : 'Admin',
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.textOnPrimary,
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        if (email.isNotEmpty) ...[
+                          const SizedBox(height: 2),
+                          Text(
+                            email,
+                            style: TextStyle(
+                              fontSize: 13,
+                              color: AppColors.textOnPrimary.withOpacity(0.8),
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ],
+                      ],
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
@@ -202,12 +274,12 @@ class AdminDrawer extends StatelessWidget {
         AppSizes.paddingS,
       ),
       child: Text(
-        title,
+        title.toUpperCase(),
         style: const TextStyle(
-          fontSize: 12,
-          fontWeight: FontWeight.w600,
+          fontSize: 11,
+          fontWeight: FontWeight.w700,
           color: AppColors.textTertiary,
-          letterSpacing: 1.0,
+          letterSpacing: 1.2,
         ),
       ),
     );
@@ -219,8 +291,9 @@ class AdminDrawer extends StatelessWidget {
     VoidCallback onTap, {
     Color? color,
   }) {
+    final tileColor = color ?? AppColors.textSecondary;
     return ListTile(
-      leading: Icon(icon, color: color ?? AppColors.textSecondary, size: 22),
+      leading: Icon(icon, color: tileColor, size: 22),
       title: Text(
         title,
         style: TextStyle(
@@ -229,12 +302,17 @@ class AdminDrawer extends StatelessWidget {
           color: color ?? AppColors.textPrimary,
         ),
       ),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(8),
+      ),
       onTap: () {
         Get.back(); // close drawer
         onTap();
       },
       dense: true,
-      contentPadding: const EdgeInsets.symmetric(horizontal: AppSizes.paddingL),
+      contentPadding: const EdgeInsets.symmetric(
+        horizontal: AppSizes.paddingL,
+      ),
     );
   }
 
@@ -248,7 +326,10 @@ class AdminDrawer extends StatelessWidget {
         title: const Text('Logout'),
         content: const Text('Are you sure you want to logout?'),
         actions: [
-          TextButton(onPressed: () => Get.back(), child: const Text('Cancel')),
+          TextButton(
+            onPressed: () => Get.back(),
+            child: const Text('Cancel'),
+          ),
           TextButton(
             onPressed: () async {
               await SecureStorageService.to.clearAll();
