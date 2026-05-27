@@ -44,15 +44,15 @@ class ProfileScreen extends GetView<ProfileController> {
                 Obx(() => _buildInfoRow(
                       icon: Icons.phone_rounded,
                       label: 'Phone',
-                      value: controller.phoneController.text.isNotEmpty
-                          ? controller.phoneController.text
+                      value: controller.userPhone.value.isNotEmpty
+                          ? controller.userPhone.value
                           : 'Not provided',
                     )),
                 Obx(() => _buildInfoRow(
                       icon: Icons.cake_rounded,
                       label: 'Date of Birth',
-                      value: controller.dobController.text.isNotEmpty
-                          ? controller.dobController.text
+                      value: controller.userDob.value.isNotEmpty
+                          ? controller.userDob.value
                           : 'Not provided',
                     )),
               ],
@@ -75,15 +75,15 @@ class ProfileScreen extends GetView<ProfileController> {
                 Obx(() => _buildInfoRow(
                       icon: Icons.perm_identity_rounded,
                       label: 'First Name',
-                      value: controller.firstnameController.text.isNotEmpty
-                          ? controller.firstnameController.text
+                      value: controller.userFirstName.value.isNotEmpty
+                          ? controller.userFirstName.value
                           : 'Not provided',
                     )),
                 Obx(() => _buildInfoRow(
                       icon: Icons.perm_identity_rounded,
                       label: 'Last Name',
-                      value: controller.lastnameController.text.isNotEmpty
-                          ? controller.lastnameController.text
+                      value: controller.userLastName.value.isNotEmpty
+                          ? controller.userLastName.value
                           : 'Not provided',
                     )),
               ],
@@ -142,8 +142,8 @@ class ProfileScreen extends GetView<ProfileController> {
 
           // Avatar with initials
           Obx(() {
-            final firstName = controller.firstnameController.text;
-            final lastName = controller.lastnameController.text;
+            final firstName = controller.userFirstName.value;
+            final lastName = controller.userLastName.value;
             String initials = '';
             if (firstName.isNotEmpty) initials += firstName[0].toUpperCase();
             if (lastName.isNotEmpty) initials += lastName[0].toUpperCase();

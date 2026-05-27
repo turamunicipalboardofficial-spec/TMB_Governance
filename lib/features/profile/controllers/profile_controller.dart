@@ -28,6 +28,10 @@ class ProfileController extends GetxController {
   final userRole = ''.obs;
   final userName = ''.obs;
   final userEmail = ''.obs;
+  final userPhone = ''.obs;
+  final userDob = ''.obs;
+  final userFirstName = ''.obs;
+  final userLastName = ''.obs;
 
   @override
   void onInit() {
@@ -39,9 +43,13 @@ class ProfileController extends GetxController {
     userRole.value = await SecureStorageService.to.getRole() ?? '';
     final userData = await SecureStorageService.to.getUserData();
     if (userData != null) {
+      userFirstName.value = userData['firstname'] ?? '';
+      userLastName.value = userData['lastname'] ?? '';
       userName.value =
           '${userData['firstname'] ?? ''} ${userData['lastname'] ?? ''}'.trim();
       userEmail.value = userData['email'] ?? '';
+      userPhone.value = userData['phone_no'] ?? '';
+      userDob.value = userData['dob'] ?? '';
       firstnameController.text = userData['firstname'] ?? '';
       lastnameController.text = userData['lastname'] ?? '';
       emailController.text = userData['email'] ?? '';
@@ -70,9 +78,13 @@ class ProfileController extends GetxController {
         'phone_no': phoneController.text.trim(),
         'dob': dobController.text.trim(),
       });
+      userFirstName.value = firstnameController.text.trim();
+      userLastName.value = lastnameController.text.trim();
       userName.value =
           '${firstnameController.text.trim()} ${lastnameController.text.trim()}';
       userEmail.value = emailController.text.trim();
+      userPhone.value = phoneController.text.trim();
+      userDob.value = dobController.text.trim();
       CustomSnackbar.showSuccess('Profile updated successfully');
     } catch (e) {
       CustomSnackbar.showError(e.toString());
