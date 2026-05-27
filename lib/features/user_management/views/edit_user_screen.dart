@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:tmb_governance/core/constants/app_colors.dart';
 import 'package:tmb_governance/core/constants/app_sizes.dart';
+import 'package:tmb_governance/core/design_system/molecules/inline_dropdown_field.dart';
 import 'package:tmb_governance/core/models/locality_model.dart';
 import 'package:tmb_governance/core/models/ward_model.dart';
 import 'package:tmb_governance/features/user_management/controllers/user_management_controller.dart';
@@ -193,49 +194,42 @@ class EditUserScreen extends GetView<UserManagementController> {
   Widget _buildLocalityDropdown() {
     return Obx(() {
       final wardSelected = controller.selectedCreateWardId.value != null;
-      final loading = controller.isLoadingLocalities.value;
-      final items = controller.localities.map((LocalityModel loc) {
-        return DropdownMenuItem<int>(
-          value: loc.id,
-          child: Text(loc.localityName),
-        );
-      }).toList();
-
-      return DropdownButtonFormField<int>(
-        value: controller.selectedCreateLocalityId.value,
-        decoration: InputDecoration(
-          labelText: 'Locality',
-          hintText: !wardSelected
-              ? 'Select a ward first'
-              : loading
-                  ? 'Loading localities...'
-                  : controller.localities.isEmpty
-                      ? 'No localities found'
-                      : 'Select locality',
-        ),
-        items: items,
-        onChanged: wardSelected && !loading
-            ? (int? value) {
-                controller.selectedCreateLocalityId.value = value;
-              }
-            : null,
+      final selectedLocality = controller.localities.firstWhereOrNull(
+        (l) => l.id == controller.selectedCreateLocalityId.value,
+      );
+      return InlineDropdownField<LocalityModel>(
+        value: selectedLocality,
+        items: controller.localities,
+        placeholder: wardSelected ? 'Select Locality' : 'Select a ward first',
+        label: 'Locality',
+        prefixIcon: Icons.place,
+        itemLabel: (l) => l.localityName,
+        isLoading: controller.isLoadingLocalities.value,
+        emptyMessage: wardSelected ? 'No localities found' : 'Select a ward first',
+        enabled: wardSelected,
+        onChanged: (loc) {
+          controller.selectedCreateLocalityId.value = loc?.id;
+        },
       );
     });
   }
 
   Widget _buildWardDropdown() {
     return Obx(() {
-      return DropdownButtonFormField<int>(
-        value: controller.selectedCreateWardId.value,
-        decoration: const InputDecoration(labelText: 'Ward'),
-        items: controller.wards.map((WardModel ward) {
-          return DropdownMenuItem<int>(
-            value: ward.id,
-            child: Text(ward.wardName),
-          );
-        }).toList(),
-        onChanged: (int? value) {
-          controller.selectedCreateWardId.value = value;
+      final selectedWard = controller.wards.firstWhereOrNull(
+        (w) => w.id == controller.selectedCreateWardId.value,
+      );
+      return InlineDropdownField<WardModel>(
+        value: selectedWard,
+        items: controller.wards,
+        placeholder: 'Select Ward',
+        label: 'Ward',
+        prefixIcon: Icons.location_city,
+        itemLabel: (w) => w.wardName,
+        isLoading: controller.isLoadingWards.value,
+        emptyMessage: 'No wards available',
+        onChanged: (ward) {
+          controller.selectedCreateWardId.value = ward?.id;
         },
       );
     });
