@@ -63,9 +63,12 @@ class UserManagementController extends GetxController {
   Future<void> fetchWards() async {
     isLoadingWards.value = true;
     try {
-      final response = await NetworkService.to.get('/api/wards');
-      final data = response.data['data'] as List;
-      wards.assignAll(data.map((e) => WardModel.fromJson(e)).toList());
+      final response = await NetworkService.to.get('/api/getWardList');
+      // API returns {status: success, ward: [...]}
+      final data = response.data['ward'] as List? ?? response.data['data'] as List?;
+      if (data != null) {
+        wards.assignAll(data.map((e) => WardModel.fromJson(e)).toList());
+      }
     } catch (e) {
       // Silently fail, wards are optional
     } finally {
@@ -133,7 +136,8 @@ class UserManagementController extends GetxController {
   }
 
   Future<void> createUser() async {
-    if (formKey.currentState == null || !formKey.currentState!.validate()) return;
+    if (formKey.currentState == null || !formKey.currentState!.validate())
+      return;
 
     isCreating.value = true;
     try {
@@ -147,7 +151,9 @@ class UserManagementController extends GetxController {
           dob: dobCtrl.text.trim(),
           phoneNo: phoneNoCtrl.text.trim(),
           wardId: selectedCreateWardId.value!,
-          locality: localityCtrl.text.trim().isEmpty ? null : localityCtrl.text.trim(),
+          locality: localityCtrl.text.trim().isEmpty
+              ? null
+              : localityCtrl.text.trim(),
           driverLicenseNumber: driverLicenseCtrl.text.trim(),
           licenseExpiry: licenseExpiryCtrl.text.trim(),
           truckId: selectedTruckId.value,
@@ -163,7 +169,9 @@ class UserManagementController extends GetxController {
           dob: dobCtrl.text.trim(),
           phoneNo: phoneNoCtrl.text.trim(),
           wardId: selectedCreateWardId.value!,
-          locality: localityCtrl.text.trim().isEmpty ? null : localityCtrl.text.trim(),
+          locality: localityCtrl.text.trim().isEmpty
+              ? null
+              : localityCtrl.text.trim(),
         );
         await _repository.createEmployee(request);
         CustomSnackbar.showSuccess('Employee created successfully');
@@ -176,7 +184,9 @@ class UserManagementController extends GetxController {
           dob: dobCtrl.text.trim(),
           phoneNo: phoneNoCtrl.text.trim(),
           wardId: selectedCreateWardId.value,
-          locality: localityCtrl.text.trim().isEmpty ? null : localityCtrl.text.trim(),
+          locality: localityCtrl.text.trim().isEmpty
+              ? null
+              : localityCtrl.text.trim(),
         );
         await _repository.createConsumer(request);
         CustomSnackbar.showSuccess('Consumer created successfully');
@@ -198,14 +208,22 @@ class UserManagementController extends GetxController {
     isCreating.value = true;
     try {
       final request = UpdateUserRequest(
-        firstname: firstnameCtrl.text.trim().isEmpty ? null : firstnameCtrl.text.trim(),
-        lastname: lastnameCtrl.text.trim().isEmpty ? null : lastnameCtrl.text.trim(),
+        firstname: firstnameCtrl.text.trim().isEmpty
+            ? null
+            : firstnameCtrl.text.trim(),
+        lastname: lastnameCtrl.text.trim().isEmpty
+            ? null
+            : lastnameCtrl.text.trim(),
         email: emailCtrl.text.trim().isEmpty ? null : emailCtrl.text.trim(),
         password: passwordCtrl.text.isEmpty ? null : passwordCtrl.text,
         dob: dobCtrl.text.trim().isEmpty ? null : dobCtrl.text.trim(),
-        phoneNo: phoneNoCtrl.text.trim().isEmpty ? null : phoneNoCtrl.text.trim(),
+        phoneNo: phoneNoCtrl.text.trim().isEmpty
+            ? null
+            : phoneNoCtrl.text.trim(),
         wardId: selectedCreateWardId.value,
-        locality: localityCtrl.text.trim().isEmpty ? null : localityCtrl.text.trim(),
+        locality: localityCtrl.text.trim().isEmpty
+            ? null
+            : localityCtrl.text.trim(),
       );
       await _repository.updateUser(userId, request);
       CustomSnackbar.showSuccess('User updated successfully');
