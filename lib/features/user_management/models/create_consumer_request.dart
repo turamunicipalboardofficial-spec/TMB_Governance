@@ -6,7 +6,7 @@ class CreateConsumerRequest {
   final String dob;
   final String phoneNo;
   final int? wardId;
-  final String? locality;
+  final int? localityId;
 
   CreateConsumerRequest({
     required this.firstname,
@@ -16,7 +16,7 @@ class CreateConsumerRequest {
     required this.dob,
     required this.phoneNo,
     this.wardId,
-    this.locality,
+    this.localityId,
   });
 
   Map<String, dynamic> toJson() {
@@ -31,8 +31,8 @@ class CreateConsumerRequest {
     if (wardId != null) {
       data['ward_id'] = wardId;
     }
-    if (locality != null && locality!.isNotEmpty) {
-      data['locality'] = locality;
+    if (localityId != null) {
+      data['locality_id'] = localityId;
     }
     return data;
   }

@@ -6,7 +6,7 @@ class UpdateUserRequest {
   final String? dob;
   final String? phoneNo;
   final int? wardId;
-  final String? locality;
+  final int? localityId;
   final String? role;
 
   UpdateUserRequest({
@@ -17,7 +17,7 @@ class UpdateUserRequest {
     this.dob,
     this.phoneNo,
     this.wardId,
-    this.locality,
+    this.localityId,
     this.role,
   });
 
@@ -30,7 +30,7 @@ class UpdateUserRequest {
     if (dob != null && dob!.isNotEmpty) data['dob'] = dob;
     if (phoneNo != null && phoneNo!.isNotEmpty) data['phone_no'] = phoneNo;
     if (wardId != null) data['ward_id'] = wardId;
-    if (locality != null && locality!.isNotEmpty) data['locality'] = locality;
+    if (localityId != null) data['locality_id'] = localityId;
     if (role != null && role!.isNotEmpty) data['role'] = role;
     return data;
   }

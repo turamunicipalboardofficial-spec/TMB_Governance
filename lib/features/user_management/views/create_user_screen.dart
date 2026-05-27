@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:tmb_governance/core/constants/app_colors.dart';
 import 'package:tmb_governance/core/constants/app_sizes.dart';
+import 'package:tmb_governance/core/models/locality_model.dart';
 import 'package:tmb_governance/core/models/ward_model.dart';
 import 'package:tmb_governance/features/user_management/controllers/user_management_controller.dart';
 
@@ -221,13 +222,7 @@ class CreateUserScreen extends GetView<UserManagementController> {
         const SizedBox(height: AppSizes.paddingM),
         _buildWardDropdown(),
         const SizedBox(height: AppSizes.paddingM),
-        TextFormField(
-          controller: controller.localityCtrl,
-          decoration: const InputDecoration(
-            labelText: 'Locality',
-            hintText: 'e.g. Tura Main',
-          ),
-        ),
+        _buildLocalityDropdown(),
       ],
     );
   }
@@ -254,6 +249,40 @@ class CreateUserScreen extends GetView<UserManagementController> {
           }
           return null;
         },
+      );
+    });
+  }
+
+  Widget _buildLocalityDropdown() {
+    return Obx(() {
+      // Disable if no ward selected
+      final wardSelected = controller.selectedCreateWardId.value != null;
+      final loading = controller.isLoadingLocalities.value;
+      final items = controller.localities.map((LocalityModel loc) {
+        return DropdownMenuItem<int>(
+          value: loc.id,
+          child: Text(loc.localityName),
+        );
+      }).toList();
+
+      return DropdownButtonFormField<int>(
+        value: controller.selectedCreateLocalityId.value,
+        decoration: InputDecoration(
+          labelText: 'Locality',
+          hintText: !wardSelected
+              ? 'Select a ward first'
+              : loading
+                  ? 'Loading localities...'
+                  : controller.localities.isEmpty
+                      ? 'No localities found'
+                      : 'Select locality',
+        ),
+        items: items,
+        onChanged: wardSelected && !loading
+            ? (int? value) {
+                controller.selectedCreateLocalityId.value = value;
+              }
+            : null,
       );
     });
   }

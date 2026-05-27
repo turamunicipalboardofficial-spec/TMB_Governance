@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:tmb_governance/core/design_system/molecules/custom_snackbar.dart';
 import 'package:tmb_governance/core/error/failure.dart';
+import 'package:tmb_governance/core/models/locality_model.dart';
 import 'package:tmb_governance/core/models/ward_model.dart';
+import 'package:tmb_governance/core/network/endpoints/api_endpoints.dart';
 import 'package:tmb_governance/core/network/network_service.dart';
 import 'package:tmb_governance/features/user_management/models/create_consumer_request.dart';
 import 'package:tmb_governance/features/user_management/models/create_driver_request.dart';
@@ -53,11 +55,16 @@ class UserManagementController extends GetxController {
   final wards = <WardModel>[].obs;
   final isLoadingWards = false.obs;
 
+  // Localities
+  final localities = <LocalityModel>[].obs;
+  final isLoadingLocalities = false.obs;
+
   @override
   void onInit() {
     super.onInit();
     fetchUsers();
     fetchWards();
+    ever(selectedCreateWardId, (_) => fetchLocalities());
   }
 
   Future<void> fetchWards() async {
@@ -73,6 +80,37 @@ class UserManagementController extends GetxController {
       // Silently fail, wards are optional
     } finally {
       isLoadingWards.value = false;
+    }
+  }
+
+  Future<void> fetchLocalities() async {
+    final wardId = selectedCreateWardId.value;
+    localities.clear();
+    if (wardId == null) return;
+    isLoadingLocalities.value = true;
+    try {
+      final response = await NetworkService.to.get(
+        ApiEndpoints.localityList,
+        queryParameters: {'ward_id': wardId},
+      );
+      final data = response.data['locality'] as List? ?? [];
+      localities.assignAll(
+        data.map((e) => LocalityModel.fromJson(e)).toList(),
+      );
+      // Match pending locality name for edit mode
+      if (_pendingLocalityName != null && localities.isNotEmpty) {
+        final match = localities.firstWhereOrNull(
+          (l) => l.localityName.toLowerCase() == _pendingLocalityName!.toLowerCase(),
+        );
+        if (match != null) {
+          selectedCreateLocalityId.value = match.id;
+        }
+        _pendingLocalityName = null;
+      }
+    } catch (e) {
+      // Silently fail
+    } finally {
+      isLoadingLocalities.value = false;
     }
   }
 
@@ -151,9 +189,7 @@ class UserManagementController extends GetxController {
           dob: dobCtrl.text.trim(),
           phoneNo: phoneNoCtrl.text.trim(),
           wardId: selectedCreateWardId.value!,
-          locality: localityCtrl.text.trim().isEmpty
-              ? null
-              : localityCtrl.text.trim(),
+          localityId: selectedCreateLocalityId.value,
           driverLicenseNumber: driverLicenseCtrl.text.trim(),
           licenseExpiry: licenseExpiryCtrl.text.trim(),
           truckId: selectedTruckId.value,
@@ -169,9 +205,7 @@ class UserManagementController extends GetxController {
           dob: dobCtrl.text.trim(),
           phoneNo: phoneNoCtrl.text.trim(),
           wardId: selectedCreateWardId.value!,
-          locality: localityCtrl.text.trim().isEmpty
-              ? null
-              : localityCtrl.text.trim(),
+          localityId: selectedCreateLocalityId.value,
         );
         await _repository.createEmployee(request);
         CustomSnackbar.showSuccess('Employee created successfully');
@@ -184,9 +218,7 @@ class UserManagementController extends GetxController {
           dob: dobCtrl.text.trim(),
           phoneNo: phoneNoCtrl.text.trim(),
           wardId: selectedCreateWardId.value,
-          locality: localityCtrl.text.trim().isEmpty
-              ? null
-              : localityCtrl.text.trim(),
+          localityId: selectedCreateLocalityId.value,
         );
         await _repository.createConsumer(request);
         CustomSnackbar.showSuccess('Consumer created successfully');
@@ -221,9 +253,7 @@ class UserManagementController extends GetxController {
             ? null
             : phoneNoCtrl.text.trim(),
         wardId: selectedCreateWardId.value,
-        locality: localityCtrl.text.trim().isEmpty
-            ? null
-            : localityCtrl.text.trim(),
+        localityId: selectedCreateLocalityId.value,
       );
       await _repository.updateUser(userId, request);
       CustomSnackbar.showSuccess('User updated successfully');
@@ -254,6 +284,10 @@ class UserManagementController extends GetxController {
     }
   }
 
+  // Locality selection
+  final selectedCreateLocalityId = RxnInt();
+  String? _pendingLocalityName;
+
   void _clearForm() {
     firstnameCtrl.clear();
     lastnameCtrl.clear();
@@ -266,6 +300,8 @@ class UserManagementController extends GetxController {
     licenseExpiryCtrl.clear();
     selectedCreateWardId.value = null;
     selectedTruckId.value = null;
+    selectedCreateLocalityId.value = null;
+    localities.clear();
   }
 
   void loadUserForEdit(UserModel user) {
@@ -274,9 +310,11 @@ class UserManagementController extends GetxController {
     emailCtrl.text = user.email;
     phoneNoCtrl.text = user.phoneNo ?? '';
     dobCtrl.text = user.dob ?? '';
-    localityCtrl.text = user.locality ?? '';
-    selectedCreateWardId.value = user.wardId;
+    selectedCreateLocalityId.value = null;
+    _pendingLocalityName = user.locality;
     selectedCreateRole.value = user.role;
+    // Set ward last so ever() triggers fetchLocalities, which will match pending locality
+    selectedCreateWardId.value = user.wardId;
   }
 
   String getWardName(int? wardId) {
