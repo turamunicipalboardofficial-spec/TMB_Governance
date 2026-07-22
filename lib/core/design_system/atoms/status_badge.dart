@@ -52,6 +52,7 @@ class StatusBadge extends StatelessWidget {
       case 'in_progress':
       case 'paused':
       case 'maintenance':
+      case 'partial':
         return AppColors.infoLight;
       case 'archived':
       case 'inactive':
@@ -84,6 +85,7 @@ class StatusBadge extends StatelessWidget {
       case 'in_progress':
       case 'paused':
       case 'maintenance':
+      case 'partial':
         return AppColors.info;
       case 'archived':
       case 'inactive':

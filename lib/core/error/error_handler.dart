@@ -25,6 +25,20 @@ class ErrorHandler {
     String message = 'Something went wrong';
     if (data is Map) {
       message = data['message'] ?? data['error'] ?? message;
+
+      // Laravel validation errors (422) come back as:
+      // { "message": "Validation failed.", "errors": { "field": ["msg1", "msg2"] } }
+      // Surface the first concrete error message instead of the generic
+      // top-level "Validation failed." text so the UI shows something useful.
+      final errors = data['errors'];
+      if (errors is Map && errors.isNotEmpty) {
+        final firstValue = errors.values.first;
+        if (firstValue is List && firstValue.isNotEmpty) {
+          message = firstValue.first.toString();
+        } else if (firstValue is String) {
+          message = firstValue;
+        }
+      }
     }
     if (statusCode == 401) return AuthFailure(message);
     return ServerFailure(message, statusCode);

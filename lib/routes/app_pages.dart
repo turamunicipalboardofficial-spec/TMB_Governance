@@ -149,23 +149,23 @@ class AppPages {
       binding: TradeLicenseAdminBinding(),
     ),
 
-    // Holding Tax (CEO only)
+    // Holding Tax (CEO + Editor)
     GetPage(
       name: AppRoutes.holdingTaxStats,
       page: () => const HoldingTaxStatsScreen(),
       binding: HoldingTaxAdminBinding(),
       middlewares: [
-        RoleGuard(allowedRoles: ['ceo']),
+        RoleGuard(allowedRoles: ['ceo', 'editor']),
       ],
     ),
 
-    // Grievances (CEO + Admin)
+    // Grievances (CEO + Editor)
     GetPage(
       name: AppRoutes.grievanceList,
       page: () => const GrievanceListScreen(),
       binding: GrievanceAdminBinding(),
       middlewares: [
-        RoleGuard(allowedRoles: ['ceo', 'admin']),
+        RoleGuard(allowedRoles: ['ceo', 'editor']),
       ],
     ),
     GetPage(
@@ -174,13 +174,13 @@ class AppPages {
       binding: GrievanceAdminBinding(),
     ),
 
-    // Billing (CEO only)
+    // Billing (CEO + Editor)
     GetPage(
       name: AppRoutes.billingDashboard,
       page: () => const BillingDashboardScreen(),
       binding: BillingAdminBinding(),
       middlewares: [
-        RoleGuard(allowedRoles: ['ceo']),
+        RoleGuard(allowedRoles: ['ceo', 'editor']),
       ],
     ),
     GetPage(

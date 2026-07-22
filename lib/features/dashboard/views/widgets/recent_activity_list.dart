@@ -2,13 +2,16 @@ import 'package:flutter/material.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_sizes.dart';
 
-class RecentActivity {
+/// UI-level activity item (display data only).
+/// Named distinctly from the API model `RecentActivity` in
+/// `admin_dashboard_response.dart` to avoid a naming collision.
+class RecentActivityItem {
   final String title;
   final String description;
   final String type;
   final String timestamp;
 
-  const RecentActivity({
+  const RecentActivityItem({
     required this.title,
     this.description = '',
     this.type = 'default',
@@ -17,7 +20,7 @@ class RecentActivity {
 }
 
 class RecentActivityList extends StatelessWidget {
-  final List<RecentActivity> activities;
+  final List<RecentActivityItem> activities;
 
   const RecentActivityList({super.key, required this.activities});
 

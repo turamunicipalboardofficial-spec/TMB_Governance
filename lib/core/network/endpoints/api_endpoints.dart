@@ -44,18 +44,25 @@ class ApiEndpoints {
       '/api/admin/trade-license/broadcast-notification';
 
   // ── Admin — Holding Tax ───────────────────────
-  static const String adminHoldingTaxStats = '/api/admin/holding-tax/stats';
+  static const String holdingTaxSearch = '/api/holding-taxes/search';
+  static const String holdingTaxDetails = '/api/holding-taxes/details';
+  static const String holdingTaxPay = '/api/holding-taxes/pay';
+  static const String adminHoldingTaxStats = '/api/holding-taxes/stats';
+  static const String holdingTaxReceiptData = '/api/receipts/holding-tax';
+  static const String holdingTaxReceiptDownload = '/api/receipts/holding-tax/download';
+  static const String holdingTaxReceiptHtml = '/api/receipts/holding-tax/html';
 
   // ── Admin — Grievances ────────────────────────
-  static const String adminGrievances = '/api/admin/grievances';
+  static const String adminGrievancesAll = '/api/grievances/admin/all';
   static const String adminUpdateGrievance =
-      '/api/admin/grievances/update-status';
+      '/api/grievances/admin/update-status';
+  static const String grievanceCategories = '/api/grievances/categories';
 
   // ── Admin — Billing ───────────────────────────
-  static const String adminGenerateBills = '/api/admin/billing/generate-bills';
-  static const String adminUploadBillSheet = '/api/admin/billing/upload-sheet';
-  static const String adminUpdatePayment = '/api/admin/billing/update-payment';
-  static const String adminMarkets = '/api/markets';
+  static const String adminGenerateBills = '/api/billing/generate-monthly-bills';
+  static const String adminUploadBillSheet = '/api/billing/upload-monthly-bills';
+  static const String adminUpdatePayment = '/api/billing/payments/update-status';
+  static const String adminMarkets = '/api/billing/markets';
 
   // ── Admin — Garbage Trucks ────────────────────
   static const String adminAddTruck = '/api/admin/garbage/add-truck';

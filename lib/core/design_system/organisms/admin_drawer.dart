@@ -25,7 +25,10 @@ class AdminDrawer extends StatelessWidget {
               builder: (context, snapshot) {
                 final role = snapshot.data ?? '';
                 final isCeo = role == 'ceo';
-                final isAdmin = role == 'admin';
+                // Note: the backend has no literal 'admin' role — the closest
+                // equivalent is 'editor'. Kept as isAdmin for readability
+                // across the nav sections below.
+                final isAdmin = role == 'editor';
                 return ListView(
                   padding: EdgeInsets.zero,
                   children: [
@@ -58,7 +61,7 @@ class AdminDrawer extends StatelessWidget {
                         'Grievances',
                         () => Get.toNamed(AppRoutes.grievanceList),
                       ),
-                    if (isCeo)
+                    if (isCeo || isAdmin)
                       _buildTile(
                         Icons.receipt_rounded,
                         'Billing',
@@ -104,7 +107,7 @@ class AdminDrawer extends StatelessWidget {
                         'Pet Dog Applications',
                         () => Get.toNamed(AppRoutes.petDogList),
                       ),
-                    if (isCeo)
+                    if (isCeo || isAdmin)
                       _buildTile(
                         Icons.account_balance_rounded,
                         'Holding Tax Stats',

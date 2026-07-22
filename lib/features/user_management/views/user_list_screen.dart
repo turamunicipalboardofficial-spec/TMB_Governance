@@ -385,7 +385,7 @@ class UserListScreen extends GetView<UserManagementController> {
         return const Color(0xFF6A1B9A);
       case 'editor':
         return const Color(0xFF2E7D32);
-      case 'consumer':
+      case 'user':
         return const Color(0xFF1565C0);
       case 'driver':
         return const Color(0xFFEF6C00);
@@ -398,7 +398,7 @@ class UserListScreen extends GetView<UserManagementController> {
     switch (role) {
       case 'editor':
         return 'EMPLOYEE';
-      case 'consumer':
+      case 'user':
         return 'CONSUMER';
       case 'ceo':
         return 'CEO';
@@ -415,7 +415,7 @@ class UserListScreen extends GetView<UserManagementController> {
         return Icons.workspace_premium;
       case 'editor':
         return Icons.badge;
-      case 'consumer':
+      case 'user':
         return Icons.person;
       case 'driver':
         return Icons.local_shipping;

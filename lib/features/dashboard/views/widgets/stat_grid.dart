@@ -12,7 +12,6 @@ class DashboardStatGrid extends StatelessWidget {
   Widget build(BuildContext context) {
     final summary = data.systemSummary;
     final payments = data.paymentRevenue.payments;
-    final workflow = data.workflowAnalytics.workflow;
 
     final stats = [
       _StatItem(
@@ -35,7 +34,7 @@ class DashboardStatGrid extends StatelessWidget {
       ),
       _StatItem(
         title: 'Approved',
-        value: _formatNumber(workflow.paymentCompleted),
+        value: _formatNumber(summary.totalApprovedForms),
         icon: Icons.check_circle_outline,
         color: AppColors.success,
       ),
@@ -59,7 +58,7 @@ class DashboardStatGrid extends StatelessWidget {
       ),
       _StatItem(
         title: 'Revenue',
-        value: _formatCurrency(payments.totalRevenue.toDouble()),
+        value: _formatCurrency(summary.totalRevenue.toDouble()),
         icon: Icons.currency_rupee,
         color: AppColors.success,
       ),

@@ -150,7 +150,8 @@ class UserManagementController extends GetxController {
     } on Failure catch (f) {
       CustomSnackbar.showError(f.message);
     } catch (e) {
-      CustomSnackbar.showError('Failed to load users');
+      debugPrint('❌ fetchUsers parsing/unexpected error: $e');
+      CustomSnackbar.showError('Failed to load users: ${e.toString()}');
     } finally {
       isLoading.value = false;
     }
