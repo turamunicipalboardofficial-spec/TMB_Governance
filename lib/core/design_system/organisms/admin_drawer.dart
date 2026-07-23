@@ -70,7 +70,7 @@ class AdminDrawer extends StatelessWidget {
                       ),
                     const Divider(indent: 16, endIndent: 16),
                     _buildSectionTitle('Communication'),
-                    if (isCeo)
+                    if (isCeo || isAdmin)
                       _buildTile(
                         Icons.campaign_rounded,
                         'Advertisements',

@@ -32,6 +32,16 @@ class AuthController extends GetxController {
         password: passwordController.text,
       );
       final response = await _repository.login(request);
+
+      // This is the staff/admin app (CEO, Editor, Driver only). Consumers
+      // have their own separate citizen app and must not be let in here.
+      if (response.role == 'consumer') {
+        CustomSnackbar.showError(
+          'This app is for staff use only. Please use the citizen app to log in.',
+        );
+        return;
+      }
+
       await SecureStorageService.to.saveToken(response.accessToken);
       await SecureStorageService.to.saveRole(response.role);
       await SecureStorageService.to.saveUserData(response.userDetails.toJson());

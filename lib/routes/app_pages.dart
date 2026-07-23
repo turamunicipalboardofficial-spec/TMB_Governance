@@ -219,13 +219,13 @@ class AppPages {
       binding: GarbageAdminBinding(),
     ),
 
-    // Advertisements (CEO only)
+    // Advertisements (CEO + Editor)
     GetPage(
       name: AppRoutes.adList,
       page: () => const AdListScreen(),
       binding: AdvertisementAdminBinding(),
       middlewares: [
-        RoleGuard(allowedRoles: ['ceo']),
+        RoleGuard(allowedRoles: ['ceo', 'editor']),
       ],
     ),
     GetPage(

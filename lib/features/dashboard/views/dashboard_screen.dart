@@ -223,9 +223,9 @@ class _AlertsBanner extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(AppSizes.paddingM),
       decoration: BoxDecoration(
-        color: AppColors.warningLight,
+        color: AppColors.primaryExtraLight,
         borderRadius: BorderRadius.circular(AppSizes.radiusM),
-        border: Border.all(color: AppColors.warning.withOpacity(0.3)),
+        border: Border.all(color: AppColors.primary.withOpacity(0.3)),
       ),
       child: Wrap(
         spacing: AppSizes.paddingS,
@@ -235,9 +235,10 @@ class _AlertsBanner extends StatelessWidget {
                   avatar: Icon(c.icon, size: 16, color: c.color),
                   label: Text(
                     c.label,
-                    style: TextStyle(fontSize: 12, color: AppColors.textPrimary),
+                    style: TextStyle(fontSize: 12, color: c.color, fontWeight: FontWeight.w600),
                   ),
-                  backgroundColor: AppColors.surface,
+                  backgroundColor: _chipBackground(c.color),
+                  side: BorderSide(color: c.color.withOpacity(0.3)),
                   padding: EdgeInsets.zero,
                   materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                 ))
@@ -253,6 +254,18 @@ class _AlertChip {
   final Color color;
 
   const _AlertChip(this.label, this.icon, this.color);
+}
+
+/// Maps a status color to its matching light theme background,
+/// so each alert chip (pending approvals, failed payments, etc.)
+/// is tinted according to its own severity instead of a flat neutral color.
+Color _chipBackground(Color color) {
+  if (color == AppColors.warning) return AppColors.warningLight;
+  if (color == AppColors.error) return AppColors.errorLight;
+  if (color == AppColors.success) return AppColors.successLight;
+  if (color == AppColors.info) return AppColors.infoLight;
+  if (color == AppColors.accent) return AppColors.accentExtraLight;
+  return AppColors.surface;
 }
 
 /// The dashboard body content (no Scaffold wrapper).

@@ -74,11 +74,12 @@ class ApiEndpoints {
   static const String adminGarbageDashboard = '/api/admin/trucks/dashboard';
 
   // ── Admin — Advertisements ────────────────────
-  static const String adminAds = '/api/admin/advertisements';
-  static const String adminAdPublish = '/api/admin/advertisements/{id}/publish';
-  static const String adminAdPause = '/api/admin/advertisements/{id}/pause';
-  static const String adminAdReject = '/api/admin/advertisements/{id}/reject';
-  static const String adminAdStats = '/api/admin/advertisements/statistics';
+  static const String adminAds = '/api/advertisements';
+  static const String adminAdDetail = '/api/advertisements/{id}';
+  static const String adminAdPublish = '/api/advertisements/{id}/publish';
+  static const String adminAdPause = '/api/advertisements/{id}/pause';
+  static const String adminAdReject = '/api/advertisements/{id}/reject';
+  static const String adminAdStats = '/api/advertisements/stats/overview';
 
   // ── Admin — Notices / Announcements ───────────
   static const String adminNotices = '/api/notices';
