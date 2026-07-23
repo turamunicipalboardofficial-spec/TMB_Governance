@@ -11,7 +11,8 @@ import 'package:tmb_governance/features/user_management/models/create_driver_req
 import 'package:tmb_governance/features/user_management/models/create_employee_request.dart';
 import 'package:tmb_governance/features/user_management/models/update_user_request.dart';
 import 'package:tmb_governance/features/user_management/models/user_model.dart';
-import 'package:tmb_governance/features/user_management/repositories/user_management_repository.dart';
+import 'package:tmb_governance/features/user_management/repositories/user_management_repository.dart'
+    show UserManagementRepository, TruckOption;
 
 class UserManagementController extends GetxController {
   final UserManagementRepository _repository;
@@ -59,12 +60,44 @@ class UserManagementController extends GetxController {
   final localities = <LocalityModel>[].obs;
   final isLoadingLocalities = false.obs;
 
+  // Trucks (driver creation only)
+  final wardTrucks = <TruckOption>[].obs;
+  final isLoadingTrucks = false.obs;
+
   @override
   void onInit() {
     super.onInit();
     fetchUsers();
     fetchWards();
-    ever(selectedCreateWardId, (_) => fetchLocalities());
+    ever(selectedCreateWardId, (_) {
+      fetchLocalities();
+      if (selectedCreateRole.value == 'driver') fetchWardTrucks();
+    });
+    ever(selectedCreateRole, (role) {
+      if (role == 'driver' && selectedCreateWardId.value != null) {
+        fetchWardTrucks();
+      } else {
+        wardTrucks.clear();
+        selectedTruckId.value = null;
+      }
+    });
+  }
+
+  Future<void> fetchWardTrucks() async {
+    final wardId = selectedCreateWardId.value;
+    wardTrucks.clear();
+    selectedTruckId.value = null;
+    if (wardId == null) return;
+    isLoadingTrucks.value = true;
+    try {
+      final trucks = await _repository.getWardTrucks(wardId);
+      wardTrucks.assignAll(trucks);
+    } catch (e) {
+      // Truck list is optional; driver can still be created without one.
+      debugPrint('❌ Failed to fetch ward trucks: $e');
+    } finally {
+      isLoadingTrucks.value = false;
+    }
   }
 
   Future<void> fetchWards() async {
@@ -151,7 +184,7 @@ class UserManagementController extends GetxController {
       CustomSnackbar.showError(f.message);
     } catch (e) {
       debugPrint('❌ fetchUsers parsing/unexpected error: $e');
-      CustomSnackbar.showError('Failed to load users: ${e.toString()}');
+      CustomSnackbar.showError('Failed to load users');
     } finally {
       isLoading.value = false;
     }
@@ -240,6 +273,7 @@ class UserManagementController extends GetxController {
           localityId: selectedCreateLocalityId.value,
           driverLicenseNumber: driverLicenseCtrl.text.trim(),
           licenseExpiry: licenseExpiryCtrl.text.trim(),
+          truckId: selectedTruckId.value,
         );
         await _repository.createDriver(request);
         CustomSnackbar.showSuccess('Driver created successfully');
@@ -251,7 +285,7 @@ class UserManagementController extends GetxController {
     } on Failure catch (f) {
       CustomSnackbar.showError(f.message);
     } catch (e) {
-      CustomSnackbar.showError('Failed to create user: ${e.toString()}');
+      CustomSnackbar.showError('Failed to create user');
     } finally {
       isCreating.value = false;
     }
@@ -323,6 +357,7 @@ class UserManagementController extends GetxController {
     selectedTruckId.value = null;
     selectedCreateLocalityId.value = null;
     localities.clear();
+    wardTrucks.clear();
   }
 
   void loadUserForEdit(UserModel user) {

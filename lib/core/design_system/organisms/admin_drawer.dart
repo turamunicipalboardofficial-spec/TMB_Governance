@@ -49,12 +49,7 @@ class AdminDrawer extends StatelessWidget {
                       'Applications',
                       () => Get.toNamed(AppRoutes.formApproval),
                     ),
-                    if (isCeo)
-                      _buildTile(
-                        Icons.receipt_long_rounded,
-                        'Trade License',
-                        () => Get.toNamed(AppRoutes.renewalList),
-                      ),
+                 
                     if (isCeo || isAdmin)
                       _buildTile(
                         Icons.report_problem_rounded,
@@ -64,10 +59,10 @@ class AdminDrawer extends StatelessWidget {
                     if (isCeo || isAdmin)
                       _buildTile(
                         Icons.receipt_rounded,
-                        'Billing',
+                        'Commercial Rent',
                         () => Get.toNamed(AppRoutes.billingDashboard),
                       ),
-                    if (isCeo)
+                    if (isCeo || isAdmin)
                       _buildTile(
                         Icons.delete_rounded,
                         'Garbage Management',
@@ -95,18 +90,13 @@ class AdminDrawer extends StatelessWidget {
                       ),
                     const Divider(indent: 16, endIndent: 16),
                     _buildSectionTitle('Reports'),
-                    if (isCeo)
+                    if (isCeo || isAdmin)
                       _buildTile(
                         Icons.payment_rounded,
                         'Payment History',
                         () => Get.toNamed(AppRoutes.paymentHistory),
                       ),
-                    if (isCeo)
-                      _buildTile(
-                        Icons.pets_rounded,
-                        'Pet Dog Applications',
-                        () => Get.toNamed(AppRoutes.petDogList),
-                      ),
+                    
                     if (isCeo || isAdmin)
                       _buildTile(
                         Icons.account_balance_rounded,

@@ -12,7 +12,7 @@ class ApiEndpoints {
 
   // ── Admin — Dashboard ─────────────────────────
   static const String adminDashboard = '/api/dashboard/admin';
-  static const String adminPaymentHistory = '/api/admin/payment-history';
+  static const String adminPaymentHistory = '/api/dashboard/admin/payment-history';
 
   // ── Admin — Forms ─────────────────────────────
   static const String adminGetAllForms = '/api/getAllForms';
@@ -65,12 +65,13 @@ class ApiEndpoints {
   static const String adminMarkets = '/api/billing/markets';
 
   // ── Admin — Garbage Trucks ────────────────────
-  static const String adminAddTruck = '/api/admin/garbage/add-truck';
-  static const String adminUpdateTruck = '/api/admin/garbage/update-truck';
-  static const String adminAssignDriver = '/api/admin/garbage/assign-driver';
-  static const String adminCreateSchedule =
-      '/api/admin/garbage/create-schedule';
-  static const String adminGarbageDashboard = '/api/admin/garbage/dashboard';
+  static const String trucksByWard = '/api/trucks/ward/{wardId}';
+  static const String adminTrucks = '/api/admin/trucks';
+  static const String adminUpdateTruck = '/api/admin/trucks/{id}';
+  static const String adminListDrivers = '/api/admin/trucks/drivers';
+  static const String adminAssignDriver = '/api/admin/trucks/assign-driver';
+  static const String adminCreateSchedule = '/api/admin/trucks/schedule';
+  static const String adminGarbageDashboard = '/api/admin/trucks/dashboard';
 
   // ── Admin — Advertisements ────────────────────
   static const String adminAds = '/api/admin/advertisements';
@@ -80,12 +81,13 @@ class ApiEndpoints {
   static const String adminAdStats = '/api/admin/advertisements/statistics';
 
   // ── Admin — Notices / Announcements ───────────
-  static const String adminNotices = '/api/admin/notices';
-  static const String adminNoticePublish = '/api/admin/notices/{id}/publish';
-  static const String adminNoticeArchive = '/api/admin/notices/{id}/archive';
-  static const String adminNoticeTogglePin =
-      '/api/admin/notices/{id}/toggle-pin';
-  static const String adminNoticeStats = '/api/admin/notices/statistics';
+  static const String adminNotices = '/api/notices';
+  static const String adminNoticeDetail = '/api/notices/{id}';
+  static const String adminNoticePublish = '/api/notices/{id}/publish';
+  static const String adminNoticeArchive = '/api/notices/{id}/archive';
+  static const String adminNoticeTogglePin = '/api/notices/{id}/toggle-pin';
+  static const String adminNoticeStats = '/api/notices/stats/overview';
+  static const String noticeDownloadPdf = '/api/feed/notices/{id}/download-pdf';
 
   // ── Admin — Notifications ─────────────────────
   static const String adminNotifications = '/api/admin/notifications';

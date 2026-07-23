@@ -21,7 +21,7 @@ class GenerateBillsScreen extends GetView<BillingAdminController> {
       child: Scaffold(
         backgroundColor: AppColors.background,
         appBar: AppBar(
-          title: const Text('Generate Bills'),
+          title: const Text('Generate Rent Bills'),
           backgroundColor: AppColors.primary,
           foregroundColor: AppColors.textOnPrimary,
           bottom: const TabBar(
@@ -86,7 +86,7 @@ class _ManualEntryTab extends GetView<BillingAdminController> {
               )),
           const SizedBox(height: AppSizes.paddingXL),
           Obx(() => PrimaryButton(
-                text: 'Generate Bills',
+                text: 'Generate Rent Bills',
                 icon: Icons.receipt_long_outlined,
                 isLoading: controller.isGenerating.value,
                 onPressed: controller.submitGenerateBills,

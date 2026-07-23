@@ -18,7 +18,7 @@ class UpdatePaymentScreen extends GetView<BillingAdminController> {
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
-        title: const Text('Update Payment'),
+        title: const Text('Update Rent Payment'),
         backgroundColor: AppColors.primary,
         foregroundColor: AppColors.textOnPrimary,
       ),

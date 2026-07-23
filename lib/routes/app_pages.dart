@@ -194,13 +194,13 @@ class AppPages {
       binding: BillingAdminBinding(),
     ),
 
-    // Garbage Admin (CEO only)
+    // Garbage Admin (CEO + Editor)
     GetPage(
       name: AppRoutes.garbageDashboard,
       page: () => const GarbageDashboardScreen(),
       binding: GarbageAdminBinding(),
       middlewares: [
-        RoleGuard(allowedRoles: ['ceo']),
+        RoleGuard(allowedRoles: ['ceo', 'editor']),
       ],
     ),
     GetPage(
@@ -279,13 +279,13 @@ class AppPages {
       binding: NotificationAdminBinding(),
     ),
 
-    // Payment History (CEO only)
+    // Payment History (CEO + Editor)
     GetPage(
       name: AppRoutes.paymentHistory,
       page: () => const PaymentHistoryScreen(),
       binding: PaymentHistoryBinding(),
       middlewares: [
-        RoleGuard(allowedRoles: ['ceo']),
+        RoleGuard(allowedRoles: ['ceo', 'editor']),
       ],
     ),
 

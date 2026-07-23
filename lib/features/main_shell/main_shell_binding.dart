@@ -14,6 +14,8 @@ import '../grievance_admin/controllers/grievance_admin_controller.dart';
 import '../grievance_admin/data/grievance_admin_data_source.dart';
 import '../grievance_admin/repositories/grievance_admin_repository.dart';
 import '../notice_admin/controllers/notice_admin_controller.dart';
+import '../notice_admin/data/notice_admin_data_source.dart';
+import '../notice_admin/repositories/notice_admin_repository.dart';
 import '../notification_admin/controllers/notification_admin_controller.dart';
 
 class MainShellBinding extends Bindings {
@@ -44,8 +46,10 @@ class MainShellBinding extends Bindings {
     Get.lazyPut(() => GrievanceAdminRepository(Get.find<GrievanceAdminDataSource>()));
     Get.lazyPut(() => GrievanceAdminController(Get.find<GrievanceAdminRepository>()));
 
-    // Notice Admin (no data source / repository)
-    Get.lazyPut(() => NoticeAdminController());
+    // Notice Admin (has data source + repository)
+    Get.lazyPut(() => NoticeAdminDataSource());
+    Get.lazyPut(() => NoticeAdminRepository(Get.find<NoticeAdminDataSource>()));
+    Get.lazyPut(() => NoticeAdminController(Get.find<NoticeAdminRepository>()));
 
     // Notification Admin (no data source / repository)
     Get.lazyPut(() => NotificationAdminController());

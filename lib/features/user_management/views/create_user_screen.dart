@@ -6,6 +6,8 @@ import 'package:tmb_governance/core/design_system/molecules/inline_dropdown_fiel
 import 'package:tmb_governance/core/models/locality_model.dart';
 import 'package:tmb_governance/core/models/ward_model.dart';
 import 'package:tmb_governance/features/user_management/controllers/user_management_controller.dart';
+import 'package:tmb_governance/features/user_management/repositories/user_management_repository.dart'
+    show TruckOption;
 
 class CreateUserScreen extends GetView<UserManagementController> {
   const CreateUserScreen({super.key});
@@ -61,8 +63,6 @@ class CreateUserScreen extends GetView<UserManagementController> {
             _buildRoleChip('Employee', 'employee', Icons.badge),
             const SizedBox(width: AppSizes.paddingS),
             _buildRoleChip('Consumer', 'consumer', Icons.person),
-            const SizedBox(width: AppSizes.paddingS),
-            _buildRoleChip('CEO', 'ceo', Icons.workspace_premium),
             const SizedBox(width: AppSizes.paddingS),
             _buildRoleChip('Driver', 'driver', Icons.local_shipping),
           ],
@@ -326,8 +326,33 @@ class CreateUserScreen extends GetView<UserManagementController> {
             return null;
           },
         ),
+        const SizedBox(height: AppSizes.paddingM),
+        _buildTruckDropdown(),
       ],
     );
+  }
+
+  Widget _buildTruckDropdown() {
+    return Obx(() {
+      final wardSelected = controller.selectedCreateWardId.value != null;
+      final selectedTruck = controller.wardTrucks.firstWhereOrNull(
+        (t) => t.id == controller.selectedTruckId.value,
+      );
+      return InlineDropdownField<TruckOption>(
+        value: selectedTruck,
+        items: controller.wardTrucks,
+        placeholder: wardSelected ? 'Select Truck (optional)' : 'Select a ward first',
+        label: 'Assign Truck',
+        prefixIcon: Icons.local_shipping_outlined,
+        itemLabel: (t) => t.displayLabel,
+        isLoading: controller.isLoadingTrucks.value,
+        emptyMessage: wardSelected ? 'No trucks available in this ward' : 'Select a ward first',
+        enabled: wardSelected,
+        onChanged: (truck) {
+          controller.selectedTruckId.value = truck?.id;
+        },
+      );
+    });
   }
 
   Widget _buildSubmitButton() {

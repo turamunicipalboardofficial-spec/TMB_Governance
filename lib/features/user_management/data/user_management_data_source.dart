@@ -61,9 +61,16 @@ class UserManagementDataSource {
   }
 
   Future<dynamic> toggleUserActive(int userId, bool isActive) async {
-    final response = await NetworkService.to.patch(
+    final response = await NetworkService.to.post(
       ApiEndpoints.adminToggleUserActive.replaceAll('{id}', userId.toString()),
       data: {'is_active': isActive},
+    );
+    return response.data;
+  }
+
+  Future<dynamic> getWardTrucks(int wardId) async {
+    final response = await NetworkService.to.get(
+      ApiEndpoints.trucksByWard.replaceAll('{wardId}', wardId.toString()),
     );
     return response.data;
   }

@@ -360,7 +360,7 @@ class DashboardBody extends GetView<DashboardController> {
               if (data.billingAnalytics.billing.totalMarkets > 0) ...[
                 const SizedBox(height: AppSizes.paddingXXL),
                 Text(
-                  'Billing Overview',
+                  'Commercial Rent Overview',
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.w600,

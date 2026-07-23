@@ -19,7 +19,7 @@ class BillingDashboardScreen extends GetView<BillingAdminController> {
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
-        title: const Text('Billing Management'),
+        title: const Text('Commercial Rent'),
         backgroundColor: AppColors.primary,
         foregroundColor: AppColors.textOnPrimary,
       ),
@@ -61,7 +61,7 @@ class BillingDashboardScreen extends GetView<BillingAdminController> {
         Expanded(
           child: _ActionCard(
             icon: Icons.edit_note_outlined,
-            label: 'Generate Bills',
+            label: 'Generate Rent Bills',
             color: AppColors.primary,
             onTap: () => Get.toNamed(AppRoutes.generateBills),
           ),
@@ -186,7 +186,7 @@ class BillingDashboardScreen extends GetView<BillingAdminController> {
             child: EmptyState(
               icon: Icons.receipt_long_outlined,
               title: 'No Bills Yet',
-              message: 'No billing history found for this shop.',
+              message: 'No commercial rent history found for this shop.',
             ),
           )
         else
