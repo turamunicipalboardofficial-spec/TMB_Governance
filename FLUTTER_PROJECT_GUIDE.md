@@ -23,7 +23,7 @@
 
 | Key | Value |
 |---|---|
-| **App Name** | Tura Municipal Admin |
+| **App Name** | TMB Governance |
 | **Package Name** | `com.turamunicipal.admin` |
 | **Base URL (Dev)** | `http://14.102.148.70:8975` |
 | **Base URL (Prod)** | `http://14.102.148.70:8975` |
@@ -2640,4 +2640,4 @@ The driver route map should:
 
 ---
 
-> **End of Guide** — This document contains everything needed to build the Tura Municipal Admin Flutter app from scratch. Follow the architecture conventions, implement features in the specified order, and use the exact API endpoints and models documented above.
+> **End of Guide** — This document contains everything needed to build the TMB Governance Flutter app from scratch. Follow the architecture conventions, implement features in the specified order, and use the exact API endpoints and models documented above.

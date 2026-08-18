@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import '../../../core/design_system/molecules/custom_snackbar.dart';
+import '../../../core/error/failure.dart';
 import '../../../core/storage/secure_storage_service.dart';
 import '../../../routes/app_routes.dart';
 import '../models/driver_route_model.dart';
@@ -12,7 +13,7 @@ enum DriverAuthState { initial, loading, authenticated, error }
 
 enum DriverShiftState { idle, loading, active, ended, error }
 
-enum DriverRouteState { initial, loading, loaded, error }
+enum DriverRouteState { initial, loading, loaded, noTruckAssigned, error }
 
 class DriverDashboardController extends GetxController {
   final DriverRepository _repository;
@@ -204,10 +205,14 @@ class DriverDashboardController extends GetxController {
         shiftState.value = DriverShiftState.idle;
         CustomSnackbar.showError(res['message'] ?? 'Failed to start shift');
       }
+    } on Failure catch (f) {
+      shiftState.value = DriverShiftState.idle;
+      errorMessage.value = f.message;
+      CustomSnackbar.showError(f.message);
     } catch (e) {
       shiftState.value = DriverShiftState.error;
-      errorMessage.value = e.toString();
-      CustomSnackbar.showError('Failed to start shift: ${e.toString()}');
+      errorMessage.value = 'Failed to start shift';
+      CustomSnackbar.showError('Failed to start shift');
     }
   }
 
@@ -237,10 +242,14 @@ class DriverDashboardController extends GetxController {
         shiftState.value = DriverShiftState.idle;
         CustomSnackbar.showError(res['message'] ?? 'Failed to end shift');
       }
+    } on Failure catch (f) {
+      shiftState.value = DriverShiftState.idle;
+      errorMessage.value = f.message;
+      CustomSnackbar.showError(f.message);
     } catch (e) {
       shiftState.value = DriverShiftState.error;
-      errorMessage.value = e.toString();
-      CustomSnackbar.showError('Failed to end shift: ${e.toString()}');
+      errorMessage.value = 'Failed to end shift';
+      CustomSnackbar.showError('Failed to end shift');
     }
   }
 
@@ -357,6 +366,15 @@ class DriverDashboardController extends GetxController {
       routeData.value = data;
       truckNumber.value = data.truck?.truckNumber;
       routeState.value = DriverRouteState.loaded;
+    } on Failure catch (f) {
+      // Backend returns 404 with "No truck assigned" when the driver profile
+      // has no truck_id set yet. This is an expected state, not an error.
+      if (f.statusCode == 404) {
+        routeState.value = DriverRouteState.noTruckAssigned;
+      } else {
+        routeState.value = DriverRouteState.error;
+        CustomSnackbar.showError(f.message);
+      }
     } catch (e) {
       routeState.value = DriverRouteState.error;
       CustomSnackbar.showError('Failed to load route');

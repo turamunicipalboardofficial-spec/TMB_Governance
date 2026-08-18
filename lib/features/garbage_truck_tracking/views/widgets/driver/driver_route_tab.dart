@@ -24,6 +24,40 @@ class DriverRouteTab extends GetView<DriverDashboardController> {
               ],
             ),
           );
+        case DriverRouteState.noTruckAssigned:
+          return Center(
+            child: Padding(
+              padding: const EdgeInsets.all(24),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.local_shipping_outlined,
+                      size: 48, color: AppColors.textTertiary),
+                  const SizedBox(height: 12),
+                  Text(
+                    'No Truck Assigned',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.textPrimary,
+                    ),
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    'You don\'t have a truck assigned yet. Please contact your admin.',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontSize: 13, color: AppColors.textSecondary),
+                  ),
+                  const SizedBox(height: 16),
+                  OutlinedButton.icon(
+                    onPressed: controller.loadDriverRoute,
+                    icon: const Icon(Icons.refresh_rounded),
+                    label: const Text('Check Again'),
+                  ),
+                ],
+              ),
+            ),
+          );
         case DriverRouteState.error:
           return Center(
             child: Column(

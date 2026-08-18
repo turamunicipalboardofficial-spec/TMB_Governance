@@ -326,7 +326,7 @@ class DashboardBody extends GetView<DashboardController> {
               const SizedBox(height: AppSizes.paddingXXL),
 
               // Form-wise Analytics
-              if (data.formWiseAnalytics.any((f) => f.totalApplications > 0)) ...[
+              if (data.formWiseAnalytics.any((f) => (f.totalSubmitted ?? 0) > 0)) ...[
                 Text(
                   'Services Overview',
                   style: TextStyle(

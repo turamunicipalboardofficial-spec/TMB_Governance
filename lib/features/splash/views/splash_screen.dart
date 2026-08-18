@@ -25,7 +25,7 @@ class SplashScreen extends StatelessWidget {
             ),
             const SizedBox(height: 24),
             Text(
-              'Tura Municipal Board',
+              'TMB Governance',
               style: AppTextStyles.h2.copyWith(color: AppColors.textOnPrimary),
             ),
             const SizedBox(height: 8),

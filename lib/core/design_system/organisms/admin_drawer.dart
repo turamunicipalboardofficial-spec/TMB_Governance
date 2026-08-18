@@ -184,7 +184,7 @@ class AdminDrawer extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Tura Municipal Board',
+                          'TMB Governance',
                           style: TextStyle(
                             fontSize: 15,
                             fontWeight: FontWeight.w700,

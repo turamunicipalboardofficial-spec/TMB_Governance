@@ -38,7 +38,7 @@ class LoginScreen extends GetView<AuthController> {
               const SizedBox(height: AppSizes.paddingXL),
 
               Text(
-                'Tura Municipal Admin',
+                'TMB Governance',
                 style: AppTextStyles.h2.copyWith(color: AppColors.primary),
                 textAlign: TextAlign.center,
               ),

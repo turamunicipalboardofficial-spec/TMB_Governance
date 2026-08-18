@@ -8,7 +8,7 @@ import '../../models/admin_dashboard_response.dart';
 /// accent color so the section reads as a set of different cards rather
 /// than repeated identical templates.
 class FormWiseAnalyticsList extends StatelessWidget {
-  final List<FormAnalytic> forms;
+  final List<FormWiseAnalytic> forms;
 
   const FormWiseAnalyticsList({super.key, required this.forms});
 
@@ -19,8 +19,8 @@ class FormWiseAnalyticsList extends StatelessWidget {
     }
 
     // Show only forms that actually have applications, most active first.
-    final activeForms = forms.where((f) => f.totalApplications > 0).toList()
-      ..sort((a, b) => b.totalApplications.compareTo(a.totalApplications));
+    final activeForms = forms.where((f) => (f.totalSubmitted ?? 0) > 0).toList()
+      ..sort((a, b) => (b.totalSubmitted ?? 0).compareTo(a.totalSubmitted ?? 0));
 
     if (activeForms.isEmpty) {
       return const SizedBox.shrink();
@@ -38,7 +38,7 @@ class FormWiseAnalyticsList extends StatelessWidget {
       itemCount: activeForms.length,
       itemBuilder: (context, index) {
         final form = activeForms[index];
-        final style = _formStyle(form.formName);
+        final style = _formStyle(form.formTypeName ?? 'Unknown');
         return _FormAnalyticCard(form: form, style: style);
       },
     );
@@ -94,7 +94,7 @@ class _FormCardStyle {
 }
 
 class _FormAnalyticCard extends StatelessWidget {
-  final FormAnalytic form;
+  final FormWiseAnalytic form;
   final _FormCardStyle style;
 
   const _FormAnalyticCard({required this.form, required this.style});
@@ -111,7 +111,7 @@ class _FormAnalyticCard extends StatelessWidget {
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
+            color: Colors.black.withValues(alpha: 0.04),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -127,18 +127,19 @@ class _FormAnalyticCard extends StatelessWidget {
                 width: 28,
                 height: 28,
                 decoration: BoxDecoration(
-                  color: style.color.withOpacity(0.1),
+                  color: style.color.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(AppSizes.radiusS),
                 ),
                 child: Icon(style.icon, size: 15, color: style.color),
               ),
               const Spacer(),
-              if (form.topStatus.isNotEmpty) StatusBadge(status: form.topStatus),
+              if ((form.topStatus ?? '').isNotEmpty)
+                StatusBadge(status: form.topStatus!),
             ],
           ),
           const SizedBox(height: AppSizes.paddingXS),
           Text(
-            form.formName,
+            form.formTypeName ?? 'Unknown',
             style: const TextStyle(
               fontSize: 12,
               fontWeight: FontWeight.w600,
@@ -149,7 +150,7 @@ class _FormAnalyticCard extends StatelessWidget {
           ),
           const SizedBox(height: AppSizes.paddingS),
           Text(
-            form.totalApplications.toString(),
+            (form.totalSubmitted ?? 0).toString(),
             style: TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.w700,
@@ -161,9 +162,9 @@ class _FormAnalyticCard extends StatelessWidget {
             style: TextStyle(fontSize: 10, color: AppColors.textTertiary),
           ),
           const SizedBox(height: AppSizes.paddingXS),
-          _MiniStat(label: 'Pending', value: form.pending, color: AppColors.warning),
+          _MiniStat(label: 'Pending', value: form.totalPending ?? 0, color: AppColors.warning),
           const SizedBox(height: 3),
-          _MiniStat(label: 'Paid', value: form.paymentCompleted, color: AppColors.success),
+          _MiniStat(label: 'Paid', value: form.paymentCompleted ?? 0, color: AppColors.success),
         ],
       ),
     );

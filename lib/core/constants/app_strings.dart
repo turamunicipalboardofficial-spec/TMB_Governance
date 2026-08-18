@@ -1,5 +1,5 @@
 class AppStrings {
-  static const String appName = 'Tura Municipal Admin';
+  static const String appName = 'TMB Governance';
   static const String login = 'Login';
   static const String logout = 'Logout';
   static const String email = 'Email';

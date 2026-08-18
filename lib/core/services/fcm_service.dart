@@ -18,12 +18,29 @@ class FcmService extends GetxService {
   }
 
   Future<void> _initFCM() async {
-    await _messaging.requestPermission(alert: true, badge: true, sound: true);
-    _currentToken = await _messaging.getToken();
-    if (_currentToken != null) {
-      // Save token locally only - server sync happens after login
-      await SecureStorageService.to.saveFcmToken(_currentToken!);
+    try {
+      await _messaging.requestPermission(
+        alert: true,
+        badge: true,
+        sound: true,
+      );
+    } catch (e) {
+      // Permission request failed (e.g. no Play Services); continue without push support.
     }
+
+    try {
+      _currentToken = await _messaging.getToken();
+      if (_currentToken != null) {
+        // Save token locally only - server sync happens after login
+        await SecureStorageService.to.saveFcmToken(_currentToken!);
+      }
+    } catch (e) {
+      // Token retrieval failed (commonly SERVICE_NOT_AVAILABLE when Google Play
+      // Services is missing/outdated or there's no network at startup).
+      // The app should keep working without a push token.
+      _currentToken = null;
+    }
+
     _messaging.onTokenRefresh.listen((token) {
       _currentToken = token;
       SecureStorageService.to.saveFcmToken(token);
@@ -32,15 +49,28 @@ class FcmService extends GetxService {
     });
     FirebaseMessaging.onMessage.listen(_handleForegroundMessage);
     FirebaseMessaging.onMessageOpenedApp.listen(_handleNotificationTap);
-    final initialMessage = await _messaging.getInitialMessage();
-    if (initialMessage != null) {
-      _handleNotificationTap(initialMessage);
+
+    try {
+      final initialMessage = await _messaging.getInitialMessage();
+      if (initialMessage != null) {
+        _handleNotificationTap(initialMessage);
+      }
+    } catch (e) {
+      // Ignore failures reading the initial message.
     }
   }
 
   /// Call this after successful login to sync FCM token to server
   Future<void> syncTokenToServer() async {
-    final token = _currentToken ?? await _messaging.getToken();
+    String? token = _currentToken;
+    if (token == null) {
+      try {
+        token = await _messaging.getToken();
+      } catch (e) {
+        // Play Services unavailable or no network; skip sync for now.
+        return;
+      }
+    }
     if (token == null) return;
     _currentToken = token;
     await SecureStorageService.to.saveFcmToken(token);
@@ -81,7 +111,8 @@ class FcmService extends GetxService {
     final authToken = await SecureStorageService.to.getToken();
     if (authToken == null) return; // Not logged in, skip server call
     try {
-      final token = _currentToken ?? await _messaging.getToken();
+      String? token = _currentToken;
+      token ??= await _messaging.getToken();
       if (token != null) {
         await NetworkService.to.delete(
           ApiEndpoints.removeFcmToken,
@@ -90,7 +121,7 @@ class FcmService extends GetxService {
         );
       }
     } catch (e) {
-      // Ignore removal errors
+      // Ignore removal errors (includes Play Services token failures)
     }
   }
 }

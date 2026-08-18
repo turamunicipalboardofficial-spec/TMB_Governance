@@ -146,7 +146,7 @@ class ProfileScreen extends GetView<ProfileController> {
               ),
               const SizedBox(height: AppSizes.paddingS),
               const Text(
-                'Tura Municipal Board',
+                'TMB Governance',
                 style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w600,

@@ -17,7 +17,7 @@ class App extends StatelessWidget {
       splitScreenMode: true,
       builder: (context, child) {
         return GetMaterialApp(
-          title: 'Tura Municipal Admin',
+          title: 'TMB Governance',
           debugShowCheckedModeBanner: false,
           theme: AppTheme.light,
           initialBinding: AppBinding(),
