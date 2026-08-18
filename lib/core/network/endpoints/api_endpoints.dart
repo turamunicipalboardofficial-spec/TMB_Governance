@@ -16,6 +16,7 @@ class ApiEndpoints {
 
   // ── Admin — Forms ─────────────────────────────
   static const String adminGetAllForms = '/api/getAllForms';
+  static const String adminGetFormTypes = '/api/getForms';
   static const String adminFormStats =
       '/api/admin/getFormsPercentageBasedOnDate';
   static const String adminApproveRejectForm =

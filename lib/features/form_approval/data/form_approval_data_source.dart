@@ -17,8 +17,8 @@ class FormApprovalDataSource {
       'page': page.toString(),
       'search': search ?? '',
       'status': status ?? '',
+      'form_type': formType,   // always sent; null when no filter selected
     };
-    if (formType != null) body['form_type'] = formType.toString();
 
     final response = await NetworkService.to.post(
       ApiEndpoints.adminGetAllForms,
@@ -51,6 +51,13 @@ class FormApprovalDataSource {
     final response = await NetworkService.to.get(
       ApiEndpoints.adminFormStats,
       queryParameters: queryParams,
+    );
+    return response.data as Map<String, dynamic>;
+  }
+
+  Future<Map<String, dynamic>> getFormTypes() async {
+    final response = await NetworkService.to.get(
+      ApiEndpoints.adminGetFormTypes,
     );
     return response.data as Map<String, dynamic>;
   }

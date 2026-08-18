@@ -14,11 +14,23 @@ class AdminDashboardResponse {
   });
 
   factory AdminDashboardResponse.fromJson(Map<String, dynamic> json) {
+    // form_wise_analytics can be either:
+    //   { "form_wise_analytics": [...] }  ← nested object from API
+    //   [...]                             ← direct list
+    final fwaRaw = json['form_wise_analytics'];
+    List<dynamic> fwaList = [];
+    if (fwaRaw is List) {
+      fwaList = fwaRaw;
+    } else if (fwaRaw is Map) {
+      final inner = fwaRaw['form_wise_analytics'];
+      if (inner is List) fwaList = inner;
+    }
+
     return AdminDashboardResponse(
       systemSummary: SystemSummary.fromJson(
         json['system_summary'] as Map<String, dynamic>? ?? {},
       ),
-      formWiseAnalytics: (json['form_wise_analytics'] as List? ?? [])
+      formWiseAnalytics: fwaList
           .map((e) => FormWiseAnalytic.fromJson(e as Map<String, dynamic>))
           .toList(),
       workflowAnalytics: WorkflowAnalytics.fromJson(
@@ -110,6 +122,16 @@ class FormWiseAnalytic {
   final int? totalApproved;
   final int? totalRejected;
   final int? totalPending;
+  // Additional fields from API
+  final int? todayApplications;
+  final int? thisMonthApplications;
+  final int? underReview;
+  final int? paymentPending;
+  final int? paymentCompleted;
+  final int? paymentFailed;
+  final num? revenueGenerated;
+  final String? lastApplicationDate;
+  final String? topStatus;
 
   FormWiseAnalytic({
     this.formTypeId,
@@ -118,16 +140,35 @@ class FormWiseAnalytic {
     this.totalApproved,
     this.totalRejected,
     this.totalPending,
+    this.todayApplications,
+    this.thisMonthApplications,
+    this.underReview,
+    this.paymentPending,
+    this.paymentCompleted,
+    this.paymentFailed,
+    this.revenueGenerated,
+    this.lastApplicationDate,
+    this.topStatus,
   });
 
   factory FormWiseAnalytic.fromJson(Map<String, dynamic> json) {
     return FormWiseAnalytic(
+      // Support both old keys and new API keys
       formTypeId: json['form_type_id'],
-      formTypeName: json['form_type_name'],
-      totalSubmitted: json['total_submitted'],
-      totalApproved: json['total_approved'],
-      totalRejected: json['total_rejected'],
-      totalPending: json['total_pending'],
+      formTypeName: json['form_type_name'] ?? json['form_name'],
+      totalSubmitted: json['total_submitted'] ?? json['total_applications'],
+      totalApproved: json['total_approved'] ?? json['approved'],
+      totalRejected: json['total_rejected'] ?? json['rejected'],
+      totalPending: json['total_pending'] ?? json['pending'],
+      todayApplications: json['today_applications'],
+      thisMonthApplications: json['this_month_applications'],
+      underReview: json['under_review'],
+      paymentPending: json['payment_pending'],
+      paymentCompleted: json['payment_completed'],
+      paymentFailed: json['payment_failed'],
+      revenueGenerated: json['revenue_generated'],
+      lastApplicationDate: json['last_application_date'],
+      topStatus: json['top_status'],
     );
   }
 }

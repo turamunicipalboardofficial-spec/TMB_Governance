@@ -4,6 +4,7 @@ import '../../../core/error/failure.dart';
 import '../../../core/design_system/molecules/custom_snackbar.dart';
 import '../../../core/storage/secure_storage_service.dart';
 import '../models/form_list_item.dart';
+import '../models/form_type.dart';
 import '../models/approve_reject_request.dart';
 import '../repositories/form_approval_repository.dart';
 
@@ -13,14 +14,16 @@ class FormApprovalController extends GetxController {
   FormApprovalController(this._repository);
 
   final forms = <FormListItem>[].obs;
+  final formTypes = <FormType>[].obs;
   final isLoading = false.obs;
+  final isLoadingFormTypes = false.obs;
   final isPaginating = false.obs;
+  final hasMore = true.obs;      // true until API returns fewer items than limit
   final currentPage = 1.obs;
-  final lastPage = 1.obs;
   final limit = 10.obs;
   final userRole = ''.obs;
   final selectedStatus = ''.obs;
-  final selectedFormType = ''.obs;
+  final selectedFormTypeId = Rxn<int>();
   final searchQuery = ''.obs;
   final remarksController = TextEditingController();
 
@@ -28,6 +31,7 @@ class FormApprovalController extends GetxController {
   void onInit() {
     super.onInit();
     _loadUserRole();
+    fetchFormTypes();
   }
 
   Future<void> _loadUserRole() async {
@@ -47,6 +51,7 @@ class FormApprovalController extends GetxController {
   Future<void> fetchForms() async {
     isLoading.value = true;
     currentPage.value = 1;
+    hasMore.value = true;
     try {
       final result = await _repository.getAllForms(
         page: 1,
@@ -54,12 +59,11 @@ class FormApprovalController extends GetxController {
         stage: _getStageParam(),
         search: searchQuery.value.isEmpty ? null : searchQuery.value,
         status: selectedStatus.value.isEmpty ? null : selectedStatus.value,
-        formType: selectedFormType.value.isEmpty
-            ? null
-            : int.tryParse(selectedFormType.value),
+        formType: selectedFormTypeId.value,
       );
       forms.assignAll(result.data);
-      lastPage.value = result.lastPage;
+      // If we got fewer items than the limit, there are no more pages
+      hasMore.value = result.data.length >= limit.value;
     } on Failure catch (f) {
       CustomSnackbar.showError(f.message);
     } finally {
@@ -67,8 +71,20 @@ class FormApprovalController extends GetxController {
     }
   }
 
+  Future<void> fetchFormTypes() async {
+    isLoadingFormTypes.value = true;
+    try {
+      final types = await _repository.getFormTypes();
+      formTypes.assignAll(types);
+    } on Failure catch (f) {
+      CustomSnackbar.showError(f.message);
+    } finally {
+      isLoadingFormTypes.value = false;
+    }
+  }
+
   Future<void> loadMore() async {
-    if (isPaginating.value || currentPage.value >= lastPage.value) return;
+    if (isPaginating.value || !hasMore.value) return;
     isPaginating.value = true;
     try {
       currentPage.value++;
@@ -78,12 +94,13 @@ class FormApprovalController extends GetxController {
         stage: _getStageParam(),
         search: searchQuery.value.isEmpty ? null : searchQuery.value,
         status: selectedStatus.value.isEmpty ? null : selectedStatus.value,
-        formType: selectedFormType.value.isEmpty
-            ? null
-            : int.tryParse(selectedFormType.value),
+        formType: selectedFormTypeId.value,
       );
       forms.addAll(result.data);
+      // If this page returned fewer items than the limit, we've reached the end
+      hasMore.value = result.data.length >= limit.value;
     } on Failure catch (f) {
+      currentPage.value--;   // roll back on error so retry is possible
       CustomSnackbar.showError(f.message);
     } finally {
       isPaginating.value = false;
@@ -95,8 +112,8 @@ class FormApprovalController extends GetxController {
     fetchForms();
   }
 
-  void filterByFormType(String formType) {
-    selectedFormType.value = formType;
+  void filterByFormType(int? formTypeId) {
+    selectedFormTypeId.value = formTypeId;
     fetchForms();
   }
 
