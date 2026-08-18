@@ -10,20 +10,16 @@ class UserManagementRepository {
 
   UserManagementRepository(this._dataSource);
 
-  Future<UserModel> createDriver(CreateDriverRequest request) async {
-    final data = await _dataSource.createDriver(request);
-    final userData = data['data']['user'];
-    return UserModel.fromJson(userData);
+  Future<void> createDriver(CreateDriverRequest request) async {
+    await _dataSource.createDriver(request);
   }
 
-  Future<UserModel> createEmployee(CreateEmployeeRequest request) async {
-    final data = await _dataSource.createEmployee(request);
-    return UserModel.fromJson(data['data']);
+  Future<void> createEmployee(CreateEmployeeRequest request) async {
+    await _dataSource.createEmployee(request);
   }
 
-  Future<UserModel> createConsumer(CreateConsumerRequest request) async {
-    final data = await _dataSource.createConsumer(request);
-    return UserModel.fromJson(data['data']);
+  Future<void> createConsumer(CreateConsumerRequest request) async {
+    await _dataSource.createConsumer(request);
   }
 
   Future<Map<String, dynamic>> listUsers({
@@ -40,25 +36,26 @@ class UserManagementRepository {
       perPage: perPage,
       page: page,
     );
-    final innerData = data['data'];
-    final users = (innerData['data'] as List)
-        .map((e) => UserModel.fromJson(e))
+    // Response: {status, actor_role, visible_roles, data: {current_page, last_page, total, per_page, data: [...]}}
+    final innerData = data['data'] as Map<String, dynamic>? ?? {};
+    final rawList = innerData['data'] as List? ?? [];
+    final users = rawList
+        .map((e) => UserModel.fromJson(e as Map<String, dynamic>))
         .toList();
     return {
       'users': users,
       'currentPage': innerData['current_page'] ?? 1,
-      'total': innerData['total'] ?? 0,
-      'perPage': innerData['per_page'] ?? 15,
+      'lastPage': innerData['last_page'] ?? 1,
+      'total': innerData['total'] ?? users.length,
+      'perPage': innerData['per_page'] ?? perPage,
     };
   }
 
-  Future<UserModel> updateUser(int userId, UpdateUserRequest request) async {
-    final data = await _dataSource.updateUser(userId, request);
-    return UserModel.fromJson(data['data']);
+  Future<void> updateUser(int userId, UpdateUserRequest request) async {
+    await _dataSource.updateUser(userId, request);
   }
 
-  Future<UserModel> toggleUserActive(int userId, bool isActive) async {
-    final data = await _dataSource.toggleUserActive(userId, isActive);
-    return UserModel.fromJson(data['data']);
+  Future<void> toggleUserActive(int userId, bool isActive) async {
+    await _dataSource.toggleUserActive(userId, isActive);
   }
 }

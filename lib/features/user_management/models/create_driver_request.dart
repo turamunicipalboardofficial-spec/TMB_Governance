@@ -5,7 +5,7 @@ class CreateDriverRequest {
   final String password;
   final String dob;
   final String phoneNo;
-  final int wardId;
+  final int? wardId;
   final int? localityId;
   final String driverLicenseNumber;
   final String licenseExpiry;
@@ -18,7 +18,7 @@ class CreateDriverRequest {
     required this.password,
     required this.dob,
     required this.phoneNo,
-    required this.wardId,
+    this.wardId,
     this.localityId,
     required this.driverLicenseNumber,
     required this.licenseExpiry,
@@ -33,16 +33,12 @@ class CreateDriverRequest {
       'password': password,
       'dob': dob,
       'phone_no': phoneNo,
-      'ward_id': wardId,
       'driver_license_number': driverLicenseNumber,
       'license_expiry': licenseExpiry,
     };
-    if (localityId != null) {
-      data['locality_id'] = localityId;
-    }
-    if (truckId != null) {
-      data['truck_id'] = truckId;
-    }
+    if (wardId != null) data['ward_id'] = wardId;
+    if (localityId != null) data['locality_id'] = localityId;
+    if (truckId != null) data['truck_id'] = truckId;
     return data;
   }
 }

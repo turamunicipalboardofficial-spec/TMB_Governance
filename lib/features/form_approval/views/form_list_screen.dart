@@ -74,7 +74,9 @@ class FormListScreen extends GetView<FormApprovalController> {
                 const SizedBox(width: AppSizes.paddingM),
                 SizedBox(
                   width: 180,
-                  child: Obx(() {
+                  child: Padding(
+                    padding: const EdgeInsets.only(right: AppSizes.paddingL),
+                    child: Obx(() {
                     final types = controller.formTypes;
                     return DropdownButtonFormField<int>(
                       initialValue: controller.selectedFormTypeId.value,
@@ -112,6 +114,7 @@ class FormListScreen extends GetView<FormApprovalController> {
                       ),
                     );
                   }),
+                  ),
                 ),
               ],
             ),

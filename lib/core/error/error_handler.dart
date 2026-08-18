@@ -23,9 +23,25 @@ class ErrorHandler {
     final statusCode = response?.statusCode;
     final data = response?.data;
     String message = 'Something went wrong';
+
     if (data is Map) {
-      message = data['message'] ?? data['error'] ?? message;
+      // 422 Validation errors — extract field messages from errors object
+      if (statusCode == 422 && data['errors'] is Map) {
+        final errors = data['errors'] as Map;
+        final fieldMessages = errors.values
+            .expand((v) => v is List ? v : [v])
+            .map((v) => v.toString())
+            .toList();
+        if (fieldMessages.isNotEmpty) {
+          message = fieldMessages.join('\n');
+        } else {
+          message = data['message'] ?? message;
+        }
+      } else {
+        message = data['message'] ?? data['error'] ?? message;
+      }
     }
+
     if (statusCode == 401) return AuthFailure(message);
     return ServerFailure(message, statusCode);
   }

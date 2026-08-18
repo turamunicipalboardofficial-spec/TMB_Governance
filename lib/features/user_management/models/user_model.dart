@@ -42,7 +42,7 @@ class UserModel {
           ? json['ward_id']
           : int.tryParse(json['ward_id']?.toString() ?? ''),
       locality: parseLocality(json['locality']),
-      isActive: json['is_active'],
+      isActive: json['is_active'] == true || json['is_active'] == 1,
     );
   }
 
