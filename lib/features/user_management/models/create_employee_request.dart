@@ -5,7 +5,7 @@ class CreateEmployeeRequest {
   final String password;
   final String dob;
   final String phoneNo;
-  final int wardId;
+  final int? wardId;
   final int? localityId;
   final String? role;
 
@@ -16,7 +16,7 @@ class CreateEmployeeRequest {
     required this.password,
     required this.dob,
     required this.phoneNo,
-    required this.wardId,
+    this.wardId,
     this.localityId,
     this.role,
   });
@@ -29,14 +29,10 @@ class CreateEmployeeRequest {
       'password': password,
       'dob': dob,
       'phone_no': phoneNo,
-      'ward_id': wardId,
     };
-    if (localityId != null) {
-      data['locality_id'] = localityId;
-    }
-    if (role != null) {
-      data['role'] = role;
-    }
+    if (wardId != null) data['ward_id'] = wardId;
+    if (localityId != null) data['locality_id'] = localityId;
+    if (role != null) data['role'] = role;
     return data;
   }
 }

@@ -1,6 +1,6 @@
 class AdminDashboardResponse {
   final SystemSummary systemSummary;
-  final List<FormAnalytic> formWiseAnalytics;
+  final List<FormWiseAnalytic> formWiseAnalytics;
   final WorkflowAnalytics workflowAnalytics;
   final PendingActionsSection pendingActions;
   final PaymentRevenue paymentRevenue;
@@ -24,11 +24,17 @@ class AdminDashboardResponse {
   });
 
   factory AdminDashboardResponse.fromJson(Map<String, dynamic> json) {
-    // form_wise_analytics is wrapped: { "form_wise_analytics": [...] }
-    final formWiseRaw = json['form_wise_analytics'];
-    final List<dynamic> formList = formWiseRaw is Map
-        ? (formWiseRaw['form_wise_analytics'] as List? ?? [])
-        : (formWiseRaw as List? ?? []);
+    // form_wise_analytics can be either:
+    //   { "form_wise_analytics": [...] }  ← nested object from API
+    //   [...]                             ← direct list
+    final fwaRaw = json['form_wise_analytics'];
+    List<dynamic> fwaList = [];
+    if (fwaRaw is List) {
+      fwaList = fwaRaw;
+    } else if (fwaRaw is Map) {
+      final inner = fwaRaw['form_wise_analytics'];
+      if (inner is List) fwaList = inner;
+    }
 
     // recent_activities is wrapped: { "recent_activities": [...] }
     final recentRaw = json['recent_activities'];
@@ -40,8 +46,8 @@ class AdminDashboardResponse {
       systemSummary: SystemSummary.fromJson(
         json['system_summary'] as Map<String, dynamic>? ?? {},
       ),
-      formWiseAnalytics: formList
-          .map((e) => FormAnalytic.fromJson(e as Map<String, dynamic>))
+      formWiseAnalytics: fwaList
+          .map((e) => FormWiseAnalytic.fromJson(e as Map<String, dynamic>))
           .toList(),
       workflowAnalytics: WorkflowAnalytics.fromJson(
         json['workflow_analytics'] as Map<String, dynamic>? ?? {},
@@ -140,64 +146,58 @@ class SystemSummary {
 
 // ─── Form-wise Analytics ─────────────────────────────────────────────────────
 
-class FormAnalytic {
-  final String formName;
-  final int totalApplications;
-  final int todayApplications;
-  final int thisMonthApplications;
-  final int pending;
-  final int approved;
-  final int rejected;
-  final int underReview;
-  final int paymentPending;
-  final int paymentCompleted;
-  final int paymentFailed;
-  final num revenueGenerated;
-  final int renewals;
-  final int newApplicationsCount;
-  final num averageProcessingDays;
+class FormWiseAnalytic {
+  final int? formTypeId;
+  final String? formTypeName;
+  final int? totalSubmitted;
+  final int? totalApproved;
+  final int? totalRejected;
+  final int? totalPending;
+  final int? todayApplications;
+  final int? thisMonthApplications;
+  final int? underReview;
+  final int? paymentPending;
+  final int? paymentCompleted;
+  final int? paymentFailed;
+  final num? revenueGenerated;
   final String? lastApplicationDate;
-  final String topStatus;
+  final String? topStatus;
 
-  FormAnalytic({
-    required this.formName,
-    required this.totalApplications,
-    required this.todayApplications,
-    required this.thisMonthApplications,
-    required this.pending,
-    required this.approved,
-    required this.rejected,
-    required this.underReview,
-    required this.paymentPending,
-    required this.paymentCompleted,
-    required this.paymentFailed,
-    required this.revenueGenerated,
-    required this.renewals,
-    required this.newApplicationsCount,
-    required this.averageProcessingDays,
+  FormWiseAnalytic({
+    this.formTypeId,
+    this.formTypeName,
+    this.totalSubmitted,
+    this.totalApproved,
+    this.totalRejected,
+    this.totalPending,
+    this.todayApplications,
+    this.thisMonthApplications,
+    this.underReview,
+    this.paymentPending,
+    this.paymentCompleted,
+    this.paymentFailed,
+    this.revenueGenerated,
     this.lastApplicationDate,
-    required this.topStatus,
+    this.topStatus,
   });
 
-  factory FormAnalytic.fromJson(Map<String, dynamic> json) {
-    return FormAnalytic(
-      formName: json['form_name'] ?? 'Unknown',
-      totalApplications: json['total_applications'] ?? 0,
-      todayApplications: json['today_applications'] ?? 0,
-      thisMonthApplications: json['this_month_applications'] ?? 0,
-      pending: json['pending'] ?? 0,
-      approved: json['approved'] ?? 0,
-      rejected: json['rejected'] ?? 0,
-      underReview: json['under_review'] ?? 0,
-      paymentPending: json['payment_pending'] ?? 0,
-      paymentCompleted: json['payment_completed'] ?? 0,
-      paymentFailed: json['payment_failed'] ?? 0,
-      revenueGenerated: json['revenue_generated'] ?? 0,
-      renewals: json['renewals'] ?? 0,
-      newApplicationsCount: json['new_applications_count'] ?? 0,
-      averageProcessingDays: json['average_processing_days'] ?? 0,
+  factory FormWiseAnalytic.fromJson(Map<String, dynamic> json) {
+    return FormWiseAnalytic(
+      formTypeId: json['form_type_id'],
+      formTypeName: json['form_type_name'] ?? json['form_name'],
+      totalSubmitted: json['total_submitted'] ?? json['total_applications'],
+      totalApproved: json['total_approved'] ?? json['approved'],
+      totalRejected: json['total_rejected'] ?? json['rejected'],
+      totalPending: json['total_pending'] ?? json['pending'],
+      todayApplications: json['today_applications'],
+      thisMonthApplications: json['this_month_applications'],
+      underReview: json['under_review'],
+      paymentPending: json['payment_pending'],
+      paymentCompleted: json['payment_completed'],
+      paymentFailed: json['payment_failed'],
+      revenueGenerated: json['revenue_generated'],
       lastApplicationDate: json['last_application_date'],
-      topStatus: json['top_status'] ?? '',
+      topStatus: json['top_status'],
     );
   }
 }
@@ -531,7 +531,6 @@ class AlertsData {
     );
   }
 
-  /// True if there's anything worth surfacing to the admin.
   bool get hasAlerts =>
       pendingApprovals > 0 ||
       failedPayments > 0 ||

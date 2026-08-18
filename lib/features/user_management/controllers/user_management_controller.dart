@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:tmb_governance/core/design_system/molecules/custom_snackbar.dart';
+import 'package:tmb_governance/core/error/error_handler.dart';
 import 'package:tmb_governance/core/error/failure.dart';
 import 'package:tmb_governance/core/models/locality_model.dart';
 import 'package:tmb_governance/core/models/ward_model.dart';
@@ -24,6 +25,7 @@ class UserManagementController extends GetxController {
   final isLoading = false.obs;
   final isPaginating = false.obs;
   final currentPage = 1.obs;
+  final lastPage = 1.obs;
   final totalUsers = 0.obs;
   final perPage = 15.obs;
 
@@ -180,18 +182,18 @@ class UserManagementController extends GetxController {
       );
       users.assignAll(result['users'] as List<UserModel>);
       totalUsers.value = result['total'] as int;
+      lastPage.value = result['lastPage'] as int;
     } on Failure catch (f) {
       CustomSnackbar.showError(f.message);
     } catch (e) {
-      debugPrint('❌ fetchUsers parsing/unexpected error: $e');
-      CustomSnackbar.showError('Failed to load users');
+      CustomSnackbar.showError('Failed to load users: ${e.toString()}');
     } finally {
       isLoading.value = false;
     }
   }
 
   Future<void> loadMore() async {
-    if (isPaginating.value || users.length >= totalUsers.value) return;
+    if (isPaginating.value || currentPage.value >= lastPage.value) return;
     isPaginating.value = true;
     try {
       currentPage.value++;
@@ -204,9 +206,11 @@ class UserManagementController extends GetxController {
       );
       users.addAll(result['users'] as List<UserModel>);
     } on Failure catch (f) {
+      currentPage.value--;
       CustomSnackbar.showError(f.message);
     } catch (e) {
-      CustomSnackbar.showError('Failed to load more users');
+      currentPage.value--;
+      CustomSnackbar.showError('Failed to load more users: ${e.toString()}');
     } finally {
       isPaginating.value = false;
     }
@@ -228,8 +232,9 @@ class UserManagementController extends GetxController {
   }
 
   Future<void> createUser() async {
-    if (formKey.currentState == null || !formKey.currentState!.validate())
+    if (formKey.currentState == null || !formKey.currentState!.validate()) {
       return;
+    }
 
     isCreating.value = true;
     try {
@@ -242,12 +247,11 @@ class UserManagementController extends GetxController {
           password: passwordCtrl.text,
           dob: dobCtrl.text.trim(),
           phoneNo: phoneNoCtrl.text.trim(),
-          wardId: selectedCreateWardId.value!,
+          wardId: selectedCreateWardId.value,
           localityId: selectedCreateLocalityId.value,
           role: role == 'ceo' ? 'ceo' : null,
         );
         await _repository.createEmployee(request);
-        CustomSnackbar.showSuccess('${role == 'ceo' ? 'CEO' : 'Employee'} created successfully');
       } else if (role == 'consumer') {
         final request = CreateConsumerRequest(
           firstname: firstnameCtrl.text.trim(),
@@ -260,7 +264,6 @@ class UserManagementController extends GetxController {
           localityId: selectedCreateLocalityId.value,
         );
         await _repository.createConsumer(request);
-        CustomSnackbar.showSuccess('Consumer created successfully');
       } else if (role == 'driver') {
         final request = CreateDriverRequest(
           firstname: firstnameCtrl.text.trim(),
@@ -269,23 +272,23 @@ class UserManagementController extends GetxController {
           password: passwordCtrl.text,
           dob: dobCtrl.text.trim(),
           phoneNo: phoneNoCtrl.text.trim(),
-          wardId: selectedCreateWardId.value!,
+          wardId: selectedCreateWardId.value,
           localityId: selectedCreateLocalityId.value,
           driverLicenseNumber: driverLicenseCtrl.text.trim(),
           licenseExpiry: licenseExpiryCtrl.text.trim(),
           truckId: selectedTruckId.value,
         );
         await _repository.createDriver(request);
-        CustomSnackbar.showSuccess('Driver created successfully');
       }
 
       _clearForm();
-      fetchUsers();
       Get.back();
+      fetchUsers();
+      CustomSnackbar.showSuccess('User has been created successfully');
     } on Failure catch (f) {
       CustomSnackbar.showError(f.message);
     } catch (e) {
-      CustomSnackbar.showError('Failed to create user');
+      CustomSnackbar.showError(ErrorHandler.handleException(e).message);
     } finally {
       isCreating.value = false;
     }
@@ -311,14 +314,14 @@ class UserManagementController extends GetxController {
         localityId: selectedCreateLocalityId.value,
       );
       await _repository.updateUser(userId, request);
-      CustomSnackbar.showSuccess('User updated successfully');
       _clearForm();
-      fetchUsers();
       Get.back();
+      fetchUsers();
+      CustomSnackbar.showSuccess('User has been updated successfully');
     } on Failure catch (f) {
       CustomSnackbar.showError(f.message);
     } catch (e) {
-      CustomSnackbar.showError('Failed to update user');
+      CustomSnackbar.showError(ErrorHandler.handleException(e).message);
     } finally {
       isCreating.value = false;
     }

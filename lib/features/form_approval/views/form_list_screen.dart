@@ -19,85 +19,89 @@ class FormListScreen extends GetView<FormApprovalController> {
         children: [
           // Filter bar
           Container(
-            padding: const EdgeInsets.all(AppSizes.paddingL),
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppSizes.paddingL,
+              vertical: AppSizes.paddingM,
+            ),
             color: AppColors.surface,
             child: Row(
               children: [
-                Expanded(
-                  child: Obx(
-                    () => DropdownButtonFormField<String>(
-                      value: controller.selectedStatus.value.isEmpty
-                          ? null
-                          : controller.selectedStatus.value,
-                      isExpanded: true,
-                      hint: const Text('Status'),
-                      items: const [
-                        DropdownMenuItem(value: '', child: Text('All')),
-                        DropdownMenuItem(
-                          value: 'pending',
-                          child: Text('Pending'),
+                Padding(
+                  padding: const EdgeInsets.only(
+                    left: AppSizes.paddingL,
+                    right: AppSizes.paddingM,
+                  ),
+                  child: SizedBox(
+                    width: 140,
+                    child: Obx(
+                      () => DropdownButtonFormField<String>(
+                        initialValue: controller.selectedStatus.value.isEmpty
+                            ? null
+                            : controller.selectedStatus.value,
+                        isExpanded: true,
+                        hint: const Text('Status'),
+                        items: const [
+                          DropdownMenuItem(value: '', child: Text('All')),
+                          DropdownMenuItem(
+                            value: 'pending',
+                            child: Text('Pending'),
+                          ),
+                          DropdownMenuItem(
+                            value: 'approved',
+                            child: Text('Approved'),
+                          ),
+                          DropdownMenuItem(
+                            value: 'rejected',
+                            child: Text('Rejected'),
+                          ),
+                        ],
+                        onChanged: (v) => controller.filterByStatus(v ?? ''),
+                        decoration: InputDecoration(
+                          contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 8,
+                          ),
+                          border: OutlineInputBorder(
+                            borderRadius:
+                                BorderRadius.circular(AppSizes.radiusM),
+                          ),
+                          isDense: true,
                         ),
-                        DropdownMenuItem(
-                          value: 'approved',
-                          child: Text('Approved'),
-                        ),
-                        DropdownMenuItem(
-                          value: 'rejected',
-                          child: Text('Rejected'),
-                        ),
-                      ],
-                      onChanged: (v) => controller.filterByStatus(v ?? ''),
-                      decoration: InputDecoration(
-                        contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 8,
-                        ),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(AppSizes.radiusM),
-                        ),
-                        isDense: true,
                       ),
                     ),
                   ),
                 ),
                 const SizedBox(width: AppSizes.paddingM),
-                Expanded(
-                  child: Obx(
-                    () => DropdownButtonFormField<String>(
-                      value: controller.selectedFormType.value.isEmpty
-                          ? null
-                          : controller.selectedFormType.value,
+                SizedBox(
+                  width: 180,
+                  child: Padding(
+                    padding: const EdgeInsets.only(right: AppSizes.paddingL),
+                    child: Obx(() {
+                    final types = controller.formTypes;
+                    return DropdownButtonFormField<int>(
+                      initialValue: controller.selectedFormTypeId.value,
                       isExpanded: true,
-                      hint: const Text('Form Type'),
-                      items: const [
-                        DropdownMenuItem(value: '', child: Text('All')),
-                        DropdownMenuItem(
-                          value: '1',
-                          child: Text('Birth Registration'),
+                      hint: controller.isLoadingFormTypes.value
+                          ? const Text('Loading...')
+                          : const Text('Form Type'),
+                      items: [
+                        const DropdownMenuItem<int>(
+                          value: null,
+                          child: Text('All'),
                         ),
-                        DropdownMenuItem(value: '2', child: Text('Complaint')),
-                        DropdownMenuItem(
-                          value: '3',
-                          child: Text('Water Tanker'),
-                        ),
-                        DropdownMenuItem(
-                          value: '5',
-                          child: Text('Trade License'),
-                        ),
-                        DropdownMenuItem(
-                          value: '10',
-                          child: Text('Death Certificate'),
-                        ),
-                        DropdownMenuItem(
-                          value: '11',
-                          child: Text('Birth Certificate'),
-                        ),
-                        DropdownMenuItem(
-                          value: '12',
-                          child: Text('Pet Dog Reg.'),
+                        ...types.map(
+                          (t) => DropdownMenuItem<int>(
+                            value: t.id,
+                            child: Text(
+                              t.name,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
                         ),
                       ],
-                      onChanged: (v) => controller.filterByFormType(v ?? ''),
+                      onChanged: controller.isLoadingFormTypes.value
+                          ? null
+                          : (v) => controller.filterByFormType(v),
                       decoration: InputDecoration(
                         contentPadding: const EdgeInsets.symmetric(
                           horizontal: 12,
@@ -108,7 +112,8 @@ class FormListScreen extends GetView<FormApprovalController> {
                         ),
                         isDense: true,
                       ),
-                    ),
+                    );
+                  }),
                   ),
                 ),
               ],
@@ -138,24 +143,25 @@ class FormListScreen extends GetView<FormApprovalController> {
                     }
                     return false;
                   },
-                  child: ListView.builder(
-                    padding: const EdgeInsets.all(AppSizes.paddingL),
-                    itemCount:
-                        controller.forms.length +
-                        (controller.isPaginating.value ? 1 : 0),
-                    itemBuilder: (context, index) {
-                      if (index == controller.forms.length) {
-                        return const Padding(
-                          padding: EdgeInsets.all(16),
-                          child: Center(child: CircularProgressIndicator()),
+                  child: Obx(
+                    () => ListView.builder(
+                      padding: const EdgeInsets.all(AppSizes.paddingL),
+                      itemCount: controller.forms.length +
+                          (controller.isPaginating.value ? 1 : 0),
+                      itemBuilder: (context, index) {
+                        if (index == controller.forms.length) {
+                          return const Padding(
+                            padding: EdgeInsets.all(16),
+                            child: Center(child: CircularProgressIndicator()),
+                          );
+                        }
+                        final form = controller.forms[index];
+                        return FormListCard(
+                          form: form,
+                          onViewDetails: () => controller.viewFormDetail(form),
                         );
-                      }
-                      final form = controller.forms[index];
-                      return FormListCard(
-                        form: form,
-                        onViewDetails: () => controller.viewFormDetail(form),
-                      );
-                    },
+                      },
+                    ),
                   ),
                 ),
               );

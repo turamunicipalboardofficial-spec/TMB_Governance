@@ -49,27 +49,26 @@ class UserManagementRepository {
     int perPage = 15,
     int page = 1,
   }) async {
-    try {
-      final data = await _dataSource.listUsers(
-        role: role,
-        wardId: wardId,
-        search: search,
-        perPage: perPage,
-        page: page,
-      );
-      final innerData = data['data'];
-      final users = (innerData['data'] as List)
-          .map((e) => UserModel.fromJson(e))
-          .toList();
-      return {
-        'users': users,
-        'currentPage': innerData['current_page'] ?? 1,
-        'total': innerData['total'] ?? 0,
-        'perPage': innerData['per_page'] ?? 15,
-      };
-    } catch (e) {
-      throw ErrorHandler.handleException(e);
-    }
+    final data = await _dataSource.listUsers(
+      role: role,
+      wardId: wardId,
+      search: search,
+      perPage: perPage,
+      page: page,
+    );
+    // Response: {status, actor_role, visible_roles, data: {current_page, last_page, total, per_page, data: [...]}}
+    final innerData = data['data'] as Map<String, dynamic>? ?? {};
+    final rawList = innerData['data'] as List? ?? [];
+    final users = rawList
+        .map((e) => UserModel.fromJson(e as Map<String, dynamic>))
+        .toList();
+    return {
+      'users': users,
+      'currentPage': innerData['current_page'] ?? 1,
+      'lastPage': innerData['last_page'] ?? 1,
+      'total': innerData['total'] ?? users.length,
+      'perPage': innerData['per_page'] ?? perPage,
+    };
   }
 
   Future<UserModel> updateUser(int userId, UpdateUserRequest request) async {

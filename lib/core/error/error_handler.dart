@@ -23,6 +23,7 @@ class ErrorHandler {
     final statusCode = response?.statusCode;
     final data = response?.data;
     String message = 'Something went wrong';
+
     if (data is Map) {
       message = data['message'] ?? data['error'] ?? message;
 
@@ -40,6 +41,7 @@ class ErrorHandler {
         }
       }
     }
+
     if (statusCode == 401) return AuthFailure(message);
     return ServerFailure(message, statusCode);
   }
