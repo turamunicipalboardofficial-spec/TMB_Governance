@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
+import '../../../core/services/app_update_service.dart';
 import '../../../core/storage/secure_storage_service.dart';
 import '../../../routes/app_routes.dart';
 
@@ -16,6 +17,9 @@ class SplashController extends GetxController {
 
   Future<void> _checkAuth() async {
     try {
+      // Check for Play Store updates (force update if available)
+      await AppUpdateService.instance.checkForUpdate();
+
       await Future.delayed(const Duration(seconds: 2));
       final token = await SecureStorageService.to.getToken();
       final role = await SecureStorageService.to.getRole();
